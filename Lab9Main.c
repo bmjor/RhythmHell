@@ -13,7 +13,7 @@
 #include "../inc/TExaS.h"
 #include "../inc/Timer.h"
 #include "../inc/ADC1.h"
-#include "../inc/DAC5.h"
+#include "../inc/DAC.h"
 #include "../inc/Arabic.h"
 #include "Chinese.h"
 #include "SmallFont.h"
@@ -226,7 +226,7 @@ int main1(void){ // main1
 }
 
 // use main2 to observe graphics
-int main(void){ // main2
+int main2(void){ // main2
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
@@ -236,7 +236,7 @@ int main(void){ // main2
   ST7735_FillScreen(ST7735_WHITE);
   ST7735_SetRotation(1);
   int xPos = 25;
-  ST7735_DrawFastVLine(25, 80, 2, ST7735_GREEN);
+  ST7735_DrawFastHLine(25, 30, 135, ST7735_BLACK);
   //ST7735_DrawBitmap(53, 151, r2, 75,55);
   // ST7735_DrawBitmap(42, 159, r2, 75,55); // player ship bottom
   // ST7735_DrawBitmap(62, 159, r2, 18,8); // player ship bottom
@@ -272,16 +272,41 @@ int main(void){ // main2
   }
 }
 
+
+
+
 // use main3 to test switches and LEDs
-int main3(void){ // main3
+int main(void){ // main3
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
   Switch_Init(); // initialize switches
   LED_Init(); // initialize LED
+  Sound_Init(); // 
+  ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
+  ST7735_FillScreen(ST7735_ORANGE);
+  ST7735_SetRotation(1);
+  uint32_t last=0,now;
+  __enable_irq();
   while(1){
+    now = Switch_In();
     // write code to test switches and LEDs
-    
+   if (Switch_In() == 1){
+    ST7735_DrawBitmap(80, 100, bevo2, 65, 43);
+    Sound_Cow2();
+   }
+   else if (Switch_In() == 2) {
+    ST7735_DrawBitmap(80, 100, bevo2, 65, 43);
+    Sound_Cow2();
+   }
+   else if (Switch_In() == 4) {
+    ST7735_DrawBitmap(25, 100, Cow2, 45,29); // player ship bottom
+    Sound_Cow1();
+   } 
+   else {
+    ST7735_DrawBitmap(25, 100, Cow1, 45,29); // player ship bottom
+    ST7735_DrawBitmap(80, 100, bevo1, 65, 43);
+   }
   }
 }
 // use main4 to test sound outputs
@@ -297,20 +322,21 @@ int main4(void){ uint32_t last=0,now;
   while(1){
     now = Switch_In(); // one of your buttons
     if((last == 0)&&(now == 1)){
-      Sound_Shoot(); // call one of your sounds
+      Sound_Cow1(); // call one of your sounds
     }
     if((last == 0)&&(now == 2)){
-      Sound_Killed(); // call one of your sounds
+      Sound_Cow2(); // call one of your sounds
     }
     if((last == 0)&&(now == 4)){
-      Sound_Explosion(); // call one of your sounds
-    }
-    if((last == 0)&&(now == 8)){
-      Sound_Fastinvader1(); // call one of your sounds
+      Sound_Beat(); // call one of your sounds
     }
     // modify this to test all your sounds
   }
 }
+
+
+
+
 
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
 int main5(void){ // final main

@@ -7,11 +7,28 @@
 #include <ti/devices/msp/msp.h>
 #include "Sound.h"
 #include "sounds/sounds.h"
-#include "../inc/DAC5.h"
 #include "../inc/Timer.h"
+#include "../inc/DAC.h" 
 
+//#include "../inc/FIFO1.h"
+//#include "FIFO2.h"
+
+#define BEATLEN 3377
+#define COW1LEN 10632
+#define COW2LEN 9450
+
+static uint32_t beatIndex;
+static uint32_t cow1Index;
+static uint32_t cow2Index;
 
 void SysTick_IntArm(uint32_t period, uint32_t priority){
+  SysTick->CTRL = 0x00;
+  SysTick->LOAD = period-1;
+
+  SCB->SHP[1] = (SCB->SHP[1]&(~0xC0000000))|priority << 30;
+
+  SysTick->VAL = 0; // Clear count
+  SysTick->CTRL = 0x07; 
   // write this
 }
 // initialize a 11kHz SysTick, however no sound should be started
@@ -19,54 +36,65 @@ void SysTick_IntArm(uint32_t period, uint32_t priority){
 // Initialize the 5-bit DAC
 void Sound_Init(void){
 // write this
-  
+  DAC_Init();
+  SysTick_IntArm(7256, 0); // (80MHz/11KHz) - 1
+  beatIndex = BEATLEN;
+  cow1Index = COW1LEN;
+  cow2Index = COW2LEN;
 }
 void SysTick_Handler(void){ // called at 11 kHz
-  // output one value to DAC if a sound is active
-    // output one value to DAC if a sound is active
-
+  uint32_t sum = 0;
+  uint32_t stream1 = 0, stream2 = 0, stream3 = 0;
+  uint8_t active_streams = 0;
+  if (beatIndex < BEATLEN) {
+    stream1 = cow_high[beatIndex]; // change later
+    beatIndex++;
+    active_streams++;
+  }
+  if (cow1Index < COW1LEN) {
+    stream2 = cow_high[cow1Index];
+    cow1Index++;
+    active_streams++;
+  }
+  if (cow2Index < COW2LEN) {
+    stream3 = cow_deep[cow2Index];
+    cow2Index++;
+    active_streams++;
+  }
+  sum = stream1 + stream2 + stream3;
+  if (active_streams > 0){
+    DAC_Out(sum/active_streams); // to prevent peaking
+  }
+  else {
+    DAC_Out(0);
+  }
 }
 
-//******* Sound_Start ************
-// This function does not output to the DAC. 
-// Rather, it sets a pointer and counter, and then enables the SysTick interrupt.
-// It starts the sound, and the SysTick ISR does the output
-// feel free to change the parameters
-// Sound should play once and stop
-// Input: pt is a pointer to an array of DAC outputs
-//        count is the length of the array
-// Output: none
-// special cases: as you wish to implement
-void Sound_Start(const uint8_t *pt, uint32_t count){
-// write this
+// //******* Sound_Start ************
+// // This function does not output to the DAC. 
+// // Rather, it sets a pointer and counter, and then enables the SysTick interrupt.
+// // It starts the sound, and the SysTick ISR does the output
+// // feel free to change the parameters
+// // Sound should play once and stop
+// // Input: pt is a pointer to an array of DAC outputs
+// //        count is the length of the array
+// //        channel is either 0 or 1
+// // Output: none
+// // special cases: as you wish to implement
+// void Sound_Start(const uint32_t *pt, uint32_t count){
+// // write this
   
-}
-void Sound_Shoot(void){
+// }
+void Sound_Cow1(void){
 // write this
-  Sound_Start( shoot, 4080);
+  cow1Index = 0;
 }
-void Sound_Killed(void){
+void Sound_Cow2(void){
 // write this
-
+  cow2Index = 0;
 }
-void Sound_Explosion(void){
+void Sound_Beat(void){
 // write this
-
-}
-
-void Sound_Fastinvader1(void){
-
-}
-void Sound_Fastinvader2(void){
-
-}
-void Sound_Fastinvader3(void){
-
-}
-void Sound_Fastinvader4(void){
-
-}
-void Sound_Highpitch(void){
-
+  beatIndex = 0;
 }
 
