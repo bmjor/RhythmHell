@@ -314,6 +314,12 @@ int main4(void){ uint32_t last=0,now;
   LED_Init(); // initialize LED
   Sound_Init();  // initialize sound
   TExaS_Init(ADC0,6,0); // ADC1 channel 6 is PB20, TExaS scope
+  //testing gs0
+  TimerG0_IntArm(40000, 4, 1); // 500hz
+  gameState=0;
+  noteArray[0][0] = {250, 400, 700, 1000, 2000, 4000,-1};
+  noteArray
+  //
   __enable_irq();
   while(1){
     now = Switch_In(); // one of your buttons
@@ -359,7 +365,9 @@ int main(void){ // final main
   // initialize all data structures
   cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 65535, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
   bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 65535, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
-
+//
+//yo this is justin im getting an "undecalred identifier cow1N" error red line here lmk if i accidentally channged smthn
+//  
   //draw background
   ST7735_FillScreen(ST7735_WHITE);
   ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
@@ -480,15 +488,13 @@ uint32_t window = 100; //testval
 //global player is currentPlayer
 void TIMG0_IRQHandler(void) {
   //todo: testcases for main, other sprite stuff
-  if((TIMG12->CPU_INT.IIDX) == 1){ 
+  if((TIMG0->CPU_INT.IIDX) == 1){ 
 if(Switch_In()&0x4){
   paused = 1;
 }
 else{
   paused = 0;
 }
-  uint32_t IndexOnce = noteArray[gameRound][currNote];
-
   globalcountr++; 
     if(globalcountr%2000 ==0) //should cause sound beat every 4 seconds b/c 500 hz * 4 = 2000
   {
@@ -518,7 +524,36 @@ else{
     else{
       bevo.state = 0;
     }
+}//moved up since ts is kind of important
+if((globalcountr==5000)/*||(noteArray[gameRound][currNote] == -1) for if we want round the end earlier if all notes r alr hit*/){
+  //end of array or no more time left (500 is dummy val for 10 seconds)
+    if(is2player){
+    currentPlayer^=0x3;
+  }
+  if(gameState==2){
+    noteArray[gameRound][currNote] = -1;
+  }
+  laststate=0;  
+  globalcountr =0;
+  currNote =0;
+  gameRound++;
+
+  semaphore = 1;
+  // if(!(state&0x01)){//procs for state2 and state0
+  //   state = 1;
+    
+  // }
+  // else if(is2player){//1 for 1 player mode 2 for 2 player mode gameMode
+  //   state = 2;
+  // }
+  // else{
+  //   state = 0;
+  // }
+
+
 }
+uint32_t IndexOnce = noteArray[gameRound][currNote];
+
 //gs2 -> 2nd player inputting
   if (gameState ==2){
    // GlobalcurrArray = GlobalcurrArray%2; //0/1 i dont update the gameround 
@@ -527,18 +562,25 @@ else{
     if(Switch_In() & currentPlayer){
         if (currentPlayer==1){
           cow1.state = 1;
-          if(!laststate){
+          Sound_Cow1();
+
+          if((!laststate)&&(currNote!=noteArrayLen)&&(globalcountr>window)){
+            //
+            //
+            //noteArrayLen is just max len per array - 1 -> decide on its val later
+            //-1 is needed to hold an extra sentinel value at the very end
+            //
             noteArray[gameRound][currNote] = globalcountr;
             currNote++;
-              Sound_Cow1();
           }
         }
         else{
           bevo.state = 1;
-          if(!laststate){
+          Sound_Cow2();
+          if((!laststate)&&(currNote!=noteArrayLen)&&(globalcountr>window)){
             noteArray[gameRound][currNote] = globalcountr;
             currNote++;
-            Sound_Cow2();
+            
           }
         }
         
@@ -554,16 +596,16 @@ else{
         }
       //setup main testcase and debug after 
     }
-
     } 
 
     //p1 hitting notes
   else if (gameState ==1){ 
-    if(globalcountr==(IndexOnce - window)){ //enterring hitwindow
+    
+    if((globalcountr==(IndexOnce - window))){ //enterring hitwindow
       valid = 1;
       
     }
-    else if (globalcountr ==(IndexOnce+window)){//exiting hitwindow
+    else if ((globalcountr ==(IndexOnce+window))&&(IndexOnce!=-1)){//exiting hitwindow
       valid = 0;
       if (currentPlayer ==1){
           cow1.life--;
@@ -620,35 +662,24 @@ else{
       }
   }
   else if (gameState ==0){
-    if(globalcountr==IndexOnce){//playing notes doesnt need to account for which player b/c only accessible from 1p
-      bevo.state = 1;
-      Sound_Cow2();
-    }
-    else{
-      bevo.state = 0;
-    }
-  }
-  if((noteArray[gameRound][currNote] == -1)||(globalcountr==5000)){//end of array or no more time left (500 is dummy val for 10 seconds)
-    laststate=0;  
-    globalcountr =0;
-    currNote =0;
-    gameRound++;
-    semaphore = 1;
-    // if(!(state&0x01)){//procs for state2 and state0
-    //   state = 1;
-      
-    // }
-    // else if(is2player){//1 for 1 player mode 2 for 2 player mode gameMode
-    //   state = 2;
-    // }
-    // else{
-    //   state = 0;
-    // }
-    if(is2player){
-      currentPlayer^=0x3;
-    }
+    if(IndexOnce!=-1){
+        //playback has playback cap dependent on window; might use a seperate var for this, tbd
+      if((globalcountr>=IndexOnce-window)&&(globalcountr<=IndexOnce+window)){//playing notes doesnt need to account for which player b/c only accessible from 1p
+        bevo.state = 1;
+        if (globalcountr==IndexOnce){
+        Sound_Cow2();
 
+        }
+        else if(globalcountr==IndexOnce+window){
+        currNote++;
+        }
+      }
+      else{
+        bevo.state = 0;
+      }
+    }
   }
+
 }
 
 
