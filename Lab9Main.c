@@ -22,6 +22,7 @@
 #include "Sound.h"
 #include "images/images.h"
 
+
 Chinese_t ChineseChars[] ={
   ying1, zhong, wen, kai, shi1, zan, ting, hui, fu, dan, shuan, ren, mo, shi1, ni, ying2, shu, le, wan, jia, yi, er, null
 };
@@ -151,21 +152,7 @@ uint32_t Random(uint32_t n){
 }
 
 
-// games  engine runs at 30Hz
-void TIMG12_IRQHandler(void){uint32_t pos,msg;
-  if((TIMG12->CPU_INT.IIDX) == 1){ // this will acknowledge
-    GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
-    GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
-// game engine goes here
-    // 1) sample slide pot
-    // 2) read input switches
-    // 3) move sprites
-    // 4) start sounds
-    // 5) set semaphore
-    // NO LCD OUTPUT IN INTERRUPT SERVICE ROUTINES
-    GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
-  }
-}
+
 uint8_t TExaS_LaunchPadLogicPB27PB26(void){
   return (0x80|((GPIOB->DOUT31_0>>26)&0x03));
 }
@@ -225,6 +212,19 @@ int main1(void){ // main1
   }
 }
 
+struct sprite {
+  int32_t x;      // x coordinate
+  int32_t y;      // y coordinate
+  const unsigned short *images[3];
+  uint8_t state; // index to the images
+  uint16_t health;   //65535     
+  int32_t w; // width
+  int32_t h; // height
+  uint8_t needDraw; // true if need to draw
+};
+typedef struct sprite sprite_t;
+
+
 // use main2 to observe graphics
 int main2(void){ // main2
   __disable_irq();
@@ -237,16 +237,10 @@ int main2(void){ // main2
   ST7735_SetRotation(1);
   int xPos = 25;
   ST7735_DrawFastHLine(25, 30, 135, ST7735_BLACK);
-  //ST7735_DrawBitmap(53, 151, r2, 75,55);
-  // ST7735_DrawBitmap(42, 159, r2, 75,55); // player ship bottom
-  // ST7735_DrawBitmap(62, 159, r2, 18,8); // player ship bottom
-  // ST7735_DrawBitmap(82, 159, r2, 18,8); // player ship bottom
-  // ST7735_DrawBitmap(0, 9, SmallEnemy10pointA, 16,10);
-  // ST7735_DrawBitmap(20,9, SmallEnemy10pointB, 16,10);
-  // ST7735_DrawBitmap(40, 9, SmallEnemy20pointA, 16,10);
-  // ST7735_DrawBitmap(60, 9, SmallEnemy20pointB, 16,10);
-  // ST7735_DrawBitmap(80, 9, SmallEnemy30pointA, 16,10);
-
+  // sprite_t cow1;
+  // sprite_t cow2;
+  // cow1.x = 25
+  // cow1.y = 100;
   // for(uint32_t t=500;t>0;t=t-5){
   //   SmallFont_OutVertical(t,104,6); // top left
   //   Clock_Delay1ms(50);              // delay 50 msec
@@ -260,14 +254,16 @@ int main2(void){ // main2
   // ST7735_OutString("Earthling!");
   // ST7735_SetCursor(2, 4);
   // ST7735_OutUDec(1234);
+  ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
+  ST7735_DrawBitmap(90, 160, box_orange, 60,60);
   while(1){
-    ST7735_DrawBitmap(xPos, 100, Cow1, 45,29); // player ship bottom
-    ST7735_DrawBitmap(80, 100, bevo1, 65, 43);
+    ST7735_DrawBitmap(xPos, 100, Cow1N, 45,29); // player ship bottom
+    ST7735_DrawBitmap(80, 100, bevoN, 65, 43);
     //xPos ++;
     //Clock_Delay1ms(50);  
     Clock_Delay1ms(200);  
-    ST7735_DrawBitmap(xPos, 100, Cow2, 45,29); // player ship bottom
-    ST7735_DrawBitmap(80, 100, bevo2, 65, 43);
+    ST7735_DrawBitmap(xPos, 100, Cow1S, 45,29); // player ship bottom
+    ST7735_DrawBitmap(80, 100, bevoS, 65, 43);
     Clock_Delay1ms(200);  
   }
 }
@@ -276,7 +272,7 @@ int main2(void){ // main2
 
 
 // use main3 to test switches and LEDs
-int main(void){ // main3
+int main3(void){ // main3
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
@@ -292,20 +288,20 @@ int main(void){ // main3
     now = Switch_In();
     // write code to test switches and LEDs
    if (Switch_In() == 1){
-    ST7735_DrawBitmap(80, 100, bevo2, 65, 43);
+    ST7735_DrawBitmap(80, 100, bevoS, 65, 43);
     Sound_Cow2();
    }
    else if (Switch_In() == 2) {
-    ST7735_DrawBitmap(80, 100, bevo2, 65, 43);
+    ST7735_DrawBitmap(80, 100, bevoS, 65, 43);
     Sound_Cow2();
    }
    else if (Switch_In() == 4) {
-    ST7735_DrawBitmap(25, 100, Cow2, 45,29); // player ship bottom
+    ST7735_DrawBitmap(25, 100, Cow1S, 45,29); // player ship bottom
     Sound_Cow1();
    } 
    else {
-    ST7735_DrawBitmap(25, 100, Cow1, 45,29); // player ship bottom
-    ST7735_DrawBitmap(80, 100, bevo1, 65, 43);
+    ST7735_DrawBitmap(25, 100, Cow1N, 45,29); // player ship bottom
+    ST7735_DrawBitmap(80, 100, bevoN, 65, 43);
    }
   }
 }
@@ -335,30 +331,143 @@ int main4(void){ uint32_t last=0,now;
 }
 
 
-
-
+sprite_t cow1;
+sprite_t bevo;
+uint8_t semaphore; 
+uint8_t gameMode; // 1 for 1 player mode, 2 for 2 player mode
+uint8_t gameRound; // index for 2D array of rounds
+uint8_t gameState; // 0 for when not accepting input, 1 for copying rhythm, 2 for creating rhythm
+uint8_t paused; // indicates whether game is paused or not
+uint8_t currentPlayer; 
 
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
-int main5(void){ // final main
+int main(void){ // final main
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
-  ST7735_InitPrintf(INITR_REDTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
-  ST7735_FillScreen(ST7735_BLACK);
+  ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
+  ST7735_FillScreen(ST7735_ORANGE);
   ADCinit();     //PB18 = ADC1 channel 5, slidepot
   Switch_Init(); // initialize switches
   LED_Init();    // initialize LED
   Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
-  TimerG12_IntArm(80000000/30,2);
+  TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
+  TimerG0_IntArm(40000, 4, 1); // 500hz
+  
   // initialize all data structures
-  __enable_irq();
+  cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 65535, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
+  bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 65535, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
 
-  while(1){
-    // wait for semaphore
-       // clear semaphore
-       // update ST7735R
-    // check for end game or level switch
+  //draw background
+  ST7735_FillScreen(ST7735_WHITE);
+  ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
+  ST7735_DrawBitmap(90, 160, box_orange, 60,60);
+    while(1){
+      if (paused) {
+        __disable_irq();
+        uint8_t tempGameMode = gameMode;
+        // draw pause screen
+
+        // JUSTIN: make pause screen, and indicate to user somehow that rehitting pause button will resume, and any other button will return to main menu/start screen  
+        // ST7735_DrawBitmap();
+        //ST7735_FillScreen(ST7735_BLUE); // temp, remove 
+
+        // Pause screen logic(Already done)
+        while (Switch_In() == 0) {
+        }
+        if (Switch_In() == 4) {
+          gameMode = tempGameMode;
+        }
+        else {
+          gameMode = 0; // if return to home is pressed, set gameMode = 0
+        }
+        // logic
+        paused = 0;
+        __enable_irq();
+      }
+      else if (gameMode == 0) {
+        __disable_irq();
+        // start screen
+        
+
+        // JUSTIN: Ditto for the start screen.
+        // ST7735_DrawBitmap();
+        
+        // ST7735_FillScreen(ST7735_WHITE); // temp, remove
+
+         //wait for player input to choose mode
+        while (!Switch_In() && Switch_In() != 4) {
+        }
+        gameMode = Switch_In();
+        __enable_irq();
+      }
+      else if (gameMode == 1) {
+        // one player mode
+        if (semaphore) {
+          //update display
+          ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
+          ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
+          semaphore = 0;
+        }
+      }
+      else if (gameMode == 2) {
+        // two player mode
+        if (semaphore) {
+          //update display
+          ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
+         // ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], 60,60);
+          semaphore = 0;
+        }
+      }
+    
+  }
+}
+
+// games  engine runs at 50Hz
+void TIMG12_IRQHandler(void){uint32_t pos,msg;
+  static uint8_t numBeats = 0;
+  static uint32_t buffer = 0;
+  static uint32_t counter = 30;
+  if((TIMG12->CPU_INT.IIDX) == 1){ // this will acknowledge
+    GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
+    GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
+    if (numBeats >= 4) {
+      
+      cow1.x += 5;
+      numBeats = 0;
+      
+    }
+    else {
+      //buffer = ADCin();
+      if (counter <= 0) {
+        counter = 30; //change to buffer
+        numBeats++;
+        cow1.y += 1;
+        //Sound_Cow1();
+      }
+      else {
+        counter--;
+      }
+    }
+    semaphore = 1;
+// game engine goes here
+    // 1) sample slide pot
+    // 2) read input switches
+    // 3) move sprites
+    // 4) start sounds
+    // 5) set semaphore
+
+    GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
+  }
+}
+
+
+// switches run at 500hz
+void TIMG0_IRQHandler(void) {
+  if((TIMG12->CPU_INT.IIDX) == 1){ 
+
+
   }
 }
