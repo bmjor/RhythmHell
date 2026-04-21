@@ -9,27 +9,29 @@ CMD_SRCS += \
 ../mspm0g3507.cmd 
 
 C_SRCS += \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/ADC1.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/Arabic.c \
+D:/MSPM0_ValvanoWare/inc/ADC1.c \
+D:/MSPM0_ValvanoWare/inc/Arabic.c \
 ../Chinese.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/Clock.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/DAC5.c \
+D:/MSPM0_ValvanoWare/inc/Clock.c \
+../DAC.c \
+D:/MSPM0_ValvanoWare/inc/DAC5.c \
 ../LED.c \
 ../Lab9Main.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/LaunchPad.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/SPI.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/ST7735.c \
+D:/MSPM0_ValvanoWare/inc/LaunchPad.c \
+D:/MSPM0_ValvanoWare/inc/SPI.c \
+D:/MSPM0_ValvanoWare/inc/ST7735.c \
 ../SmallFont.c \
 ../Sound.c \
 ../Switch.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/TExaS.c \
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/Timer.c 
+D:/MSPM0_ValvanoWare/inc/TExaS.c \
+D:/MSPM0_ValvanoWare/inc/Timer.c 
 
 C_DEPS += \
 ./ADC1.d \
 ./Arabic.d \
 ./Chinese.d \
 ./Clock.d \
+./DAC.d \
 ./DAC5.d \
 ./LED.d \
 ./Lab9Main.d \
@@ -47,6 +49,7 @@ OBJS += \
 ./Arabic.o \
 ./Chinese.o \
 ./Clock.o \
+./DAC.o \
 ./DAC5.o \
 ./LED.o \
 ./Lab9Main.o \
@@ -64,6 +67,7 @@ OBJS__QUOTED += \
 "Arabic.o" \
 "Chinese.o" \
 "Clock.o" \
+"DAC.o" \
 "DAC5.o" \
 "LED.o" \
 "Lab9Main.o" \
@@ -81,6 +85,7 @@ C_DEPS__QUOTED += \
 "Arabic.d" \
 "Chinese.d" \
 "Clock.d" \
+"DAC.d" \
 "DAC5.d" \
 "LED.d" \
 "Lab9Main.d" \
@@ -94,20 +99,21 @@ C_DEPS__QUOTED += \
 "Timer.d" 
 
 C_SRCS__QUOTED += \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/ADC1.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/Arabic.c" \
+"D:/MSPM0_ValvanoWare/inc/ADC1.c" \
+"D:/MSPM0_ValvanoWare/inc/Arabic.c" \
 "../Chinese.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/Clock.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/DAC5.c" \
+"D:/MSPM0_ValvanoWare/inc/Clock.c" \
+"../DAC.c" \
+"D:/MSPM0_ValvanoWare/inc/DAC5.c" \
 "../LED.c" \
 "../Lab9Main.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/LaunchPad.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/SPI.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/ST7735.c" \
+"D:/MSPM0_ValvanoWare/inc/LaunchPad.c" \
+"D:/MSPM0_ValvanoWare/inc/SPI.c" \
+"D:/MSPM0_ValvanoWare/inc/ST7735.c" \
 "../SmallFont.c" \
 "../Sound.c" \
 "../Switch.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/TExaS.c" \
-"C:/Users/brend/Downloads/MSPM0_ValvanoWare/inc/Timer.c" 
+"D:/MSPM0_ValvanoWare/inc/TExaS.c" \
+"D:/MSPM0_ValvanoWare/inc/Timer.c" 
 
 
