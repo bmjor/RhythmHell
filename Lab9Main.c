@@ -14,7 +14,7 @@
 #include "../inc/Timer.h"
 #include "../inc/ADC1.h"
 #include "../inc/DAC.h"
-#include "../inc/Arabic.h"
+//#include "../inc/Arabic.h"
 #include "Chinese.h"
 #include "SmallFont.h"
 #include "LED.h"
@@ -67,7 +67,7 @@ void PLL_Init(void){ // set phase lock loop (PLL)
   // Clock_Init40MHz(); // run this line for 40MHz
   Clock_Init80MHz(0);   // run this line for 80MHz
 }
-
+/*
 Arabic_t ArabicAlphabet[]={
 alif,ayh,baa,daad,daal,dhaa,dhaal,faa,ghayh,haa,ha,jeem,kaaf,khaa,laam,meem,noon,qaaf,raa,saad,seen,sheen,ta,thaa,twe,waaw,yaa,zaa,space,dot,null1
 };
@@ -90,7 +90,7 @@ int main0(void){ // main 0, demonstrate Arabic output
 }
 
 
-
+*/
 //Chinese_t GameStrings[][] = {{EnglishSel, ChineseSel, Start, Pause, Resume, ManualMode, MultiplayerMode, WinManual, LoseManual, Player1Wins, Player2Wins},
    //                         {}};
 
@@ -347,44 +347,59 @@ uint32_t window = 50;//flexible
 uint32_t pbwindow = 25;//half of window. used for gamestate 0
 uint32_t noteArrayLen = 19; //max length - 1
 uint32_t noteArray[15][20];// todo: initialize 
+uint32_t watchrr = 0;
 
-
-int main/*_g0test*/(void) {
-  uint8_t gmtest = 0; //0 -> single player, 1 -> multiplayer. use for testing
+int main(void) {
+  uint8_t gmtest = 1; //0 -> single player, 1 -> multiplayer. use for testing
+  uint8_t lastwatch = 0;
   //
-    __disable_irq();
+  __disable_irq();
+  ADCinit();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
   Switch_Init(); // initialize switches
   LED_Init(); // initialize LED
-  Sound_Init(); // 
+  //Sound_Init(); // 
   ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
   ST7735_FillScreen(ST7735_ORANGE);
   ST7735_SetRotation(1);
-  noteArray[0][0] = 500;
-  noteArray[0][1] = 1000;
-  noteArray[0][2] = 1500;
-  noteArray[0][3] = -1;
+  noteArray[0][0] = 100;
+  noteArray[0][1] = 200;
+  noteArray[0][2] = 300;
+  noteArray[0][3] = 400;
+  noteArray[0][4] = 500;
+  noteArray[0][5] = 600;
+  noteArray[0][6] = 700;
+  noteArray[0][7] = 800;
+  noteArray[0][8] = 900;
+  noteArray[0][9] = -1;
   globalcountr  = 0;
   currNote = 0;
-  bevo.health = 10;
-  cow1.health = 10;
-  if (!gmtest){
+  cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 10000, .images = {Cow1N, Cow1S, 0}, .state = 0};
+  bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 10000, .images = {bevoN, bevoS, 0}, .state = 0};
+
+  TimerG0_IntArm(40000, 4, 1); // 500hz
+  TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
+  if (gmtest==0){
   gameRound = 0;
   gameMode = 1; //testing single player
   gameState = 0; //init @ gs0
   currentPlayer = 1; //needed for single player
   }
-  else if (gmtest){
+  else if (gmtest==1){
     gameRound = 0;
     gameMode = 2;
-    gameState = 1; //init @gs1
+    gameState = 2; //init @gs2
     currentPlayer = 1;
   }
-  TimerG0_IntArm(40000, 4, 1); // 500hz
   __enable_irq();
   while(1){
-    
+    ST7735_DrawBitmap(25, 100, cow1.images[cow1.state], 45, 29);
+    ST7735_DrawBitmap(80, 100, bevo.images[bevo.state], 65, 43);
+    if(lastwatch!=watchrr){
+    ST7735_OutUDec(watchrr);
+    }
+    lastwatch = watchrr;
   }
 }
 
@@ -401,11 +416,11 @@ int main5(void){ // final main
   ADCinit();     //PB18 = ADC1 channel 5, slidepot
   Switch_Init(); // initialize switches
   LED_Init();    // initialize LED
-  //Sound_Init();  // initialize sound
+  Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
-  //TimerG0_IntArm(40000, 4, 1); // 500hz
+  TimerG0_IntArm(40000, 4, 1); // 500hz
 
   while(1){
     if (paused) {
@@ -606,7 +621,7 @@ else{
 
 }
 uint32_t IndexOnce = noteArray[gameRound][currNote];
-
+watchrr = IndexOnce;
 //gs2 -> 2nd player inputting
   if (gameState ==2){
    // GlobalcurrArray = GlobalcurrArray%2; //0/1 i dont update the gameround 
@@ -714,7 +729,7 @@ uint32_t IndexOnce = noteArray[gameRound][currNote];
   else if (gameState ==0){
     if(IndexOnce!=-1){
         //playback has playback cap dependent on window; might use a seperate var for this, tbd
-      if((globalcountr>=IndexOnce-pbwindow/2)&&(globalcountr<=IndexOnce+pbwindow)){//playing notes doesnt need to account for which player b/c only accessible from 1p
+      if((globalcountr>=IndexOnce-pbwindow/2)&&(globalcountr<=IndexOnce+window)){//playing notes doesnt need to account for which player b/c only accessible from 1p
         bevo.state = 1;
         if (globalcountr==IndexOnce){
         Sound_Cow2();
