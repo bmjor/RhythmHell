@@ -290,6 +290,7 @@ int main3(void){ // main3
    if (Switch_In() == 1){
     ST7735_DrawBitmap(80, 100, bevoS, 65, 43);
     Sound_Cow2();
+
    }
    else if (Switch_In() == 2) {
     ST7735_DrawBitmap(80, 100, bevoS, 65, 43);
@@ -297,7 +298,7 @@ int main3(void){ // main3
    }
    else if (Switch_In() == 4) {
     ST7735_DrawBitmap(25, 100, Cow1S, 45,29); // player ship bottom
-    Sound_Cow1();
+    Sound_Beat();
    } 
    else {
     ST7735_DrawBitmap(25, 100, Cow1N, 45,29); // player ship bottom
@@ -332,13 +333,18 @@ int main4(void){ uint32_t last=0,now;
 
 
 sprite_t cow1;
+sprite_t cow2;
 sprite_t bevo;
 uint8_t semaphore; 
 uint8_t gameMode; // 1 for 1 player mode, 2 for 2 player mode
 uint8_t gameRound; // index for 2D array of rounds
 uint8_t gameState; // 0 for when not accepting input, 1 for copying rhythm, 2 for creating rhythm
 uint8_t paused; // indicates whether game is paused or not
-uint8_t currentPlayer; 
+uint8_t currentPlayer = 1; 
+uint32_t globalcountr;
+uint8_t currNote = 0;
+
+uint32_t noteArray[15][20];// todo: initialize 
 
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
 int main(void){ // final main
@@ -347,80 +353,107 @@ int main(void){ // final main
   LaunchPad_Init();
   ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
   ST7735_FillScreen(ST7735_ORANGE);
+  ST7735_SetRotation(1);
   ADCinit();     //PB18 = ADC1 channel 5, slidepot
   Switch_Init(); // initialize switches
   LED_Init();    // initialize LED
-  Sound_Init();  // initialize sound
+  //Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
-  TimerG0_IntArm(40000, 4, 1); // 500hz
-  
-  // initialize all data structures
-  cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 65535, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
-  bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 65535, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
+  //TimerG0_IntArm(40000, 4, 1); // 500hz
 
-  //draw background
-  ST7735_FillScreen(ST7735_WHITE);
-  ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
-  ST7735_DrawBitmap(90, 160, box_orange, 60,60);
-    while(1){
-      if (paused) {
-        __disable_irq();
-        uint8_t tempGameMode = gameMode;
-        // draw pause screen
+  while(1){
+    if (paused) {
+      __disable_irq();
+      uint8_t tempGameMode = gameMode;
+      // draw pause screen
 
-        // JUSTIN: make pause screen, and indicate to user somehow that rehitting pause button will resume, and any other button will return to main menu/start screen  
-        // ST7735_DrawBitmap();
-        //ST7735_FillScreen(ST7735_BLUE); // temp, remove 
+      // JUSTIN: make pause screen, and indicate to user somehow that rehitting pause button will resume, and any other button will return to main menu/start screen  
+      // ST7735_DrawBitmap();
+      ST7735_FillScreen(ST7735_BLUE); // temp, remove 
 
-        // Pause screen logic(Already done)
-        while (Switch_In() == 0) {
-        }
-        if (Switch_In() == 4) {
-          gameMode = tempGameMode;
+      // Pause screen logic(Already done)
+      while (Switch_In() == 0) {
+      }
+      uint32_t press = Switch_In();
+      if (press == 4) {
+        gameMode = tempGameMode;
+      }
+      else {
+        gameMode = 0; // if return to home is pressed, set gameMode = 0
+      }
+      while (Switch_In() != 0) {}
+      // logic
+      paused = 0;
+      __enable_irq();
+    }
+    else if (gameMode == 0) {
+      __disable_irq();
+      // start screen
+      cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 65535, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
+      bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 65535, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
+      
+      // JUSTIN: Ditto for the start screen.
+      // ST7735_DrawBitmap();
+      
+      ST7735_FillScreen(ST7735_WHITE); // temp, remove
+
+        //wait for player input to choose mode
+      while (Switch_In() == 0 || Switch_In() == 4) {
+      }
+      gameMode = Switch_In();
+      while (Switch_In() != 0) {}
+      //draw background
+      ST7735_FillScreen(ST7735_WHITE);
+      ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
+      ST7735_DrawBitmap(90, 160, box_orange, 60,60);
+
+      __enable_irq();
+    }
+    
+    else if (gameMode == 1) {
+      // one player mode
+      if (semaphore) {
+        //update display
+        ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
+        ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
+        semaphore = 0;
+      }
+    }
+    else if (gameMode == 2) {
+      // two player mode
+      if (semaphore) {
+        //update display
+        ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
+        // ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], 60,60);
+        semaphore = 0;
+      }
+    }
+
+    if ((gameRound >= 15 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
+      // win/lose screen
+      if (cow1.health == 0) {
+        if (gameMode == 1){
+          ST7735_OutString("You Lose!");
         }
         else {
-          gameMode = 0; // if return to home is pressed, set gameMode = 0
+          ST7735_OutString("P2 Wins!");
         }
-        // logic
-        paused = 0;
-        __enable_irq();
       }
-      else if (gameMode == 0) {
-        __disable_irq();
-        // start screen
-        
+      else if (bevo.health == 0) {
+        ST7735_OutString("P1 Wins!");
+      }
+      else if (gameRound >= 15 && gameMode == 1) {
+        ST7735_OutString("You Win!");
+      }
 
-        // JUSTIN: Ditto for the start screen.
-        // ST7735_DrawBitmap();
-        
-        // ST7735_FillScreen(ST7735_WHITE); // temp, remove
-
-         //wait for player input to choose mode
-        while (!Switch_In() && Switch_In() != 4) {
-        }
-        gameMode = Switch_In();
-        __enable_irq();
+      while (Switch_In() == 0) {
       }
-      else if (gameMode == 1) {
-        // one player mode
-        if (semaphore) {
-          //update display
-          ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
-          ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
-          semaphore = 0;
-        }
-      }
-      else if (gameMode == 2) {
-        // two player mode
-        if (semaphore) {
-          //update display
-          ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
-         // ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], 60,60);
-          semaphore = 0;
-        }
-      }
+      gameMode = 0; 
+      
+      while (Switch_In() != 0) {}
+    }
     
   }
 }
@@ -434,18 +467,41 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
     if (numBeats >= 4) {
-      
-      cow1.x += 5;
-      numBeats = 0;
+
+      globalcountr = 0;
+      currNote = 0;
+      if (gameMode == 1) {
+        if (gameState == 0) {
+          // reset global variables for new round
+          gameState = 1;
+        }
+        else{
+          gameRound++;
+          gameState = 0;
+        }
+
+      }
+      else if (gameMode == 2){
+        if (gameState == 2) {
+          gameState = 1;
+          currentPlayer^=0x3;
+        }
+        else {
+          gameRound++;
+          gameState = 2;
+        }
+      }
+      numBeats = 0; //reset number of beats
       
     }
     else {
-      //buffer = ADCin();
-      if (counter <= 0) {
-        counter = 30; //change to buffer
+      buffer = ADCin();
+      if (counter == 0) {
+        //counter = 30; //change to buffer
+        counter = buffer;
         numBeats++;
         cow1.y += 1;
-        //Sound_Cow1();
+        Sound_Beat();
       }
       else {
         counter--;
@@ -466,8 +522,224 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
 
 // switches run at 500hz
 void TIMG0_IRQHandler(void) {
-  if((TIMG12->CPU_INT.IIDX) == 1){ 
+//todo: testcases for main, other sprite stuff
+  static uint8_t laststate = 0;
+  static uint8_t laststateforotherplayer = 0; 
+  static uint8_t valid = 0;
+  if((TIMG0->CPU_INT.IIDX) == 1){ 
+    if(Switch_In()&0x4){
+      paused = 1;
+    }
+    else{
+      paused = 0;
+    }
+    uint32_t IndexOnce = noteArray[gameRound][currNote]; // currNote and gameRound are reset and incremented respectively in 50hz timer, every 4 beats
 
+    globalcountr++; 
+
+    if(globalcountr%125000 <=100) {
+        Sound_Beat();
+    }
+
+    if (gameState ==2){
+    // GlobalcurrArray = GlobalcurrArray%2; //0/1 i dont update the gameround 
+      //add stuff later for storing rhythm from othe rplayer// addded 
+      if(globalcountr%125000 <=100)
+      {
+        Sound_Beat();
+      }
+      if(Switch_In() & currentPlayer){
+          if (currentPlayer==1){
+            cow1.state = 1;
+            if(!laststate){
+              noteArray[gameRound][currNote] = globalcountr;
+              currNote++;
+              Sound_Cow1();
+            }
+          }
+          else{
+            bevo.state = 1;
+            if(!laststate){
+              noteArray[gameRound][currNote] = globalcountr;
+              currNote++;
+              Sound_Cow2();
+            }
+          }
+          
+          laststate=1;
+      }
+        //setup main testcase and debug after 
+    // }
+      else{
+        laststate =0;
+          if (currentPlayer==1){
+            cow1.state =0;
+          }
+          else{
+            bevo.state = 0;
+          }
+      } 
+      if((Switch_In()&(currentPlayer^0x33))){
+          if (currentPlayer==2){
+            cow1.state = 1;
+            if(!laststateforotherplayer){
+                Sound_Cow1();
+              }
+          }
+          else{
+            bevo.state = 1;
+            if(!laststateforotherplayer){
+              Sound_Cow2();
+            }
+          }
+        laststateforotherplayer = 1;
+      }//noto self maybe merge later
+      else{
+        laststateforotherplayer=0;
+          if (currentPlayer==2){
+            cow1.state = 0;
+          }
+          else{
+            bevo.state = 0;
+          }
+      }
+    } 
+  
+    
+//noto self gs2 is updated for sound+state
+//noto self check if we still want sprites to play when its not a p's turn //noto self do not reset p1 animations during nextstate done
+
+  else if (gameState == 1){
+    if(globalcountr%125000 <=100)
+    {
+      Sound_Beat();
+    }
+    if(globalcountr==(IndexOnce - window)){
+      valid = 1;
+    }
+    else if (globalcountr ==(IndexOnce+window)){
+      valid = 0;
+      if (currentPlayer ==1){
+          cow1.health--;
+          cow1.state = 2;
+//          Sound_Cow1Hurt(); MISSED NOTE COW 1 DUMMY FUNC
+      }
+      else{
+        bevo.health--;
+        bevo.state = 2;
+//          Sound_Cow2Hurt(); MISSED NOTE COW 1 DUMMY FUNC
+      }
+      currNote ++;
+    }
+    if((Switch_In() & currentPlayer)){ //p1 = binary 01, p2 = binary 10
+      if(!laststate){  //noto self use switch_in() instead of gpiob done
+        //noto self do pause button stuff done
+        if (valid){
+          valid = 0;
+          currNote++;
+          if(currentPlayer ==1)  {
+            cow1.state = 1;
+            Sound_Cow1();
+          }
+          else{
+            bevo.state =1;
+            Sound_Cow2();
+          }
+                }
+        else{
+          if(currentPlayer ==1){
+            cow1.health--;
+            cow1.state = 2;
+//          Sound_Cow1Hurt(); MISSED NOTE COW 1 DUMMY FUNC
+                    }
+          else{
+            bevo.health--;
+            bevo.state = 2;
+//          Sound_Cow1Hurt(); MISSED NOTE COW 1 DUMMY FUNC
+          }
+          // if(globalcountr <=IndexOnce - extrawindow){
+          //   currNote++;
+          //   valid = 0;
+          // }
+        }
+    laststate = 1;
+    }
+    else{
+      laststate=0;
+      // bevo.state = 0;
+      // cow1.state = 0;
+    }
+    }
+    else{
+      if (currentPlayer==2){
+      bevo.state = 0;
+      }
+      else 
+      {
+      cow1.state = 0;
+      }
+    }
+    if(Switch_In() &(currentPlayer^0x3)){
+      if ((currentPlayer==1)&&(!laststateforotherplayer)){
+      bevo.state = 1;
+      Sound_Cow2();
+      }
+      else 
+      {
+      cow1.state = 1;
+      Sound_Cow1();
+      }
+    }
+    else{
+      if (currentPlayer==1){
+      bevo.state = 0;
+
+      }
+      else 
+      {
+      cow1.state = 0;
+      }
+    }
+//note to self change player/nextround at end of this if bloc
+//done
+//gs1 woks for sound
+  }
+  else if (gameState ==0){
+    if(globalcountr==IndexOnce){
+      //play sound here
+      bevo.state = 1;
+      Sound_Cow2();
+    }
+    else{
+      bevo.state = 0;
+    }
+    if(globalcountr%125000 <=100)
+    {
+      Sound_Beat();
+    }
+  }
+  if(noteArray[gameRound][currNote] == -1){
+    // bevo.sprite=0;
+    // cow1.sprite=0;
+    laststate=0;
+    //globalcountr =0;
+    //currNote =0;
+    //gameRound++;
+    // if(!(state&0x01)){//procs for state2 and state0
+    //   state = 1;
+      
+    // }
+    // else if(is2player){//1 for 1 player mode 2 for 2 player mode gameMode
+    //   state = 2;
+    // }
+    // else{
+    //   state = 0;
+    // }
+
+    // if(gameMode == 2){
+    //   currentPlayer^=0x3;
+    // }
 
   }
 }
+} 
