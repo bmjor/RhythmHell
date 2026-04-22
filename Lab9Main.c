@@ -217,7 +217,7 @@ struct sprite {
   int32_t y;      // y coordinate
   const unsigned short *images[3];
   uint8_t state; // index to the images
-  uint16_t health;   //65535     
+  int16_t health;   //65535     
   int32_t w; // width
   int32_t h; // height
   uint8_t needDraw; // true if need to draw
@@ -351,9 +351,9 @@ uint32_t pbwindow = 25;//half of window. used for gamestate 0
 uint32_t noteArrayLen = 19; //max length - 1
 uint32_t noteArray[15][20];// todo: initialize 
 uint32_t watchrr = 0;
-
+uint8_t supertempscore =0;
+#define defaultHealth 10 //can change later
 int main(void) {
-  uint8_t gmtest = 1; //0 -> single player, 1 -> multiplayer. use for testing
   uint8_t lastwatch = 0;
   //
   __disable_irq();
@@ -366,44 +366,71 @@ int main(void) {
   ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
   ST7735_FillScreen(ST7735_ORANGE);
   ST7735_SetRotation(1);
-  noteArray[0][0] = 100;
-  noteArray[0][1] = 200;
-  noteArray[0][2] = 300;
-  noteArray[0][3] = 400;
-  noteArray[0][4] = 500;
-  noteArray[0][5] = 600;
-  noteArray[0][6] = 700;
-  noteArray[0][7] = 800;
-  noteArray[0][8] = 900;
-  noteArray[0][9] = -1;
+  noteArray[0][0] = 500;
+  noteArray[0][1] = 1000;
+  noteArray[0][2] = 1500;
+  noteArray[0][3] = 2000;
+  noteArray[0][4] = -1;
+  // noteArray[0][5] = 600;
+  // noteArray[0][6] = 700;
+  // noteArray[0][7] = 800;
+  // noteArray[0][8] = 900;
+  // noteArray[0][9] = -1;
   globalcountr  = 0;
   currNote = 0;
-  cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 10000, .images = {Cow1N, Cow1S, 0}, .state = 0};
-  bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 10000, .images = {bevoN, bevoS, 0}, .state = 0};
-
-  TimerG0_IntArm(40000, 4, 1); // 500hz
-  TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
-  if (gmtest==0){
+  cow1 = (sprite_t){.x = 25, .y = cow1.y, .w = 45, .h = 29, .health = 9, .images = {Cow1N, Cow1S, 0}, .state = 0};
+  bevo = (sprite_t){.x = 80, .y = cow1.y, .w = 65, .h = 43, .health = 9, .images = {bevoN, bevoS, 0}, .state = 0};
+  cow1Box = (sprite_t){.x = 15, .y = cow1Box.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
+  bevoBox = (sprite_t){.x = 95, .y = bevoBox.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
   gameRound = 0;
-  gameMode = 1; //testing single player
-  gameState = 0; //init @ gs0
-  currentPlayer = 1; //needed for single player
-  }
-  else if (gmtest==1){
-    gameRound = 0;
-    gameMode = 2;
-    gameState = 2; //init @gs2
-    currentPlayer = 1;
-  }
+  gameState = 1;
+  gameMode = 1;
+  currentPlayer = 1;
+  uint8_t testinglaststate = 1; //delete after
+  TimerG0_IntArm(40000, 4, 1); // 500hz
+  
   __enable_irq();
   while(1){
-    ST7735_DrawBitmap(25, 100, cow1.images[cow1.state], 45, 29);
-    ST7735_DrawBitmap(80, 100, bevo.images[bevo.state], 65, 43);
-    if(lastwatch!=watchrr){
-    ST7735_OutUDec(watchrr);
+    if((globalcountr >= noteArray[gameRound][currNote] - window)&&(globalcountr <= noteArray[gameRound][currNote] + window)){
+    ST7735_SetCursor(0,4);
+    ST7735_OutChar('Y');
+    if(testinglaststate){
+    ST7735_FillScreen(ST7735_ORANGE);
+    testinglaststate = 0;
     }
-    lastwatch = watchrr;
-  }
+    }
+    else{
+    ST7735_SetCursor(0,4);
+    ST7735_OutChar('N');
+    if(!testinglaststate){
+    ST7735_FillScreen(ST7735_ORANGE);
+    testinglaststate = 1;
+    }
+    }
+    ST7735_DrawBitmap(80, bevo.y, bevo.images[bevo.state], 65, 43);
+    ST7735_DrawBitmap(25, cow1.y, cow1.images[cow1.state], 45, 29);
+    ST7735_DrawBitmap(95, bevoBox.y, bevoBox.images[bevoBox.state], 60, 60);
+    ST7735_DrawBitmap(15, cow1Box.y, cow1Box.images[cow1Box.state], 60, 60);
+    ST7735_SetCursor(0, 0);
+    ST7735_OutUDec(currNote);
+    ST7735_SetCursor(0, 1);
+    ST7735_OutUDec(cow1.health);
+    ST7735_SetCursor(0,2);
+    ST7735_OutUDec(gameRound);
+    ST7735_SetCursor(0,3);
+    ST7735_OutUDec(supertempscore);
+    
+    if (noteArray[gameRound][currNote] ==-1){
+      Clock_Delay1ms(1000);
+      __disable_irq();
+      globalcountr = 0;
+      currNote = 0;
+      cow1.health = defaultHealth;
+      bevo.health = defaultHealth;
+      __enable_irq();
+      ST7735_FillScreen(ST7735_ORANGE);
+    }
+}
 }
 
 
@@ -423,13 +450,8 @@ int main5(void){ // final main
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
-<<<<<<< HEAD
   TimerG0_IntArm(40000, 4, 1); // 500hz
 
-=======
-  //TimerG0_IntArm(40000, 4, 1); // 500hz
-  
->>>>>>> eca53ce167abad86b1a834a577db9dd137a78691
   while(1){
     if (paused) {
       __disable_irq();
@@ -458,8 +480,8 @@ int main5(void){ // final main
     else if (gameMode == 0) {
       __disable_irq();
       // start screen
-      cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 65535, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
-      bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 65535, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
+      cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = defaultHealth, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
+      bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = defaultHealth, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
       
       cow1Box = (sprite_t){.x = 15, .y = 160, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
       bevoBox = (sprite_t){.x = 95, .y = 160, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
@@ -501,9 +523,9 @@ int main5(void){ // final main
       }
     }
 
-    if ((gameRound >= 15 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
+    if ((gameRound >= 15 && gameMode == 1) || cow1.health <= 0 || bevo.health <= 0) { // edit to be number of rounds
       // win/lose screen
-      if (cow1.health == 0) {
+      if (cow1.health <= 0) {
         if (gameMode == 1){
           ST7735_OutString("You Lose!");
         }
@@ -511,7 +533,7 @@ int main5(void){ // final main
           ST7735_OutString("P2 Wins!");
         }
       }
-      else if (bevo.health == 0) {
+      else if (bevo.health <= 0) {
         ST7735_OutString("P1 Wins!");
       }
       else if (gameRound >= 15 && gameMode == 1) {
@@ -598,18 +620,13 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
 
 // switches run at 500hz
 void TIMG0_IRQHandler(void) {
-<<<<<<< HEAD
 //todo: testcases for main, other sprite stuff
   static uint8_t laststate = 0;
   static uint8_t laststateforotherplayer = 0; 
   static uint8_t valid = 0;
-
   if((TIMG0->CPU_INT.IIDX) == 1){ 
 if(Switch_In()&0x4){
   paused = 1;
-}
-else{
-  paused = 0;
 }
   globalcountr++; 
   //for when other player inputs
@@ -704,6 +721,7 @@ watchrr = IndexOnce;
       if(!laststate){  
         if (valid){
           valid = 0;
+          supertempscore++;
           currNote++;
           if(currentPlayer ==1)  {
             cow1.state = 1;
@@ -729,11 +747,9 @@ watchrr = IndexOnce;
         }
     laststate = 1;
     }
-    else{
-      laststate=0;
-    }
     }
     else{
+      laststate = 0;
       if (currentPlayer==2){
       bevo.state = 0;
       }
@@ -765,8 +781,8 @@ watchrr = IndexOnce;
 
 
   }
-
-=======
-  
-} 
->>>>>>> eca53ce167abad86b1a834a577db9dd137a78691
+  cow1.y = 100 + (defaultHealth - cow1.health)*10;
+  bevo.y = 100 + (defaultHealth - bevo.health)*10;
+  cow1Box.y =cow1.y +60;
+  bevoBox.y =bevo.y + 60;
+}
