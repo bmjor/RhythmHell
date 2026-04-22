@@ -403,12 +403,13 @@ int main(void){ // final main
       //ST7735_DrawBitmap(0, 128, p1WinScreen, 160, 128); // temp
 
       
-     ST7735_FillScreen(ST7735_WHITE); // temp, remove
+     ST7735_FillScreen(ST7735_GREEN); // temp, remove
 
         //wait for player input to choose mode
       while (Switch_In() == 0 || Switch_In() == 4) {
       }
       gameMode = Switch_In();
+      gameState = 3; // set gameState to 3 to trigger 4 beat count in
       while (Switch_In() != 0) {}
       //draw background
       ST7735_FillScreen(ST7735_WHITE);
@@ -424,6 +425,8 @@ int main(void){ // final main
         //update display
         ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
         ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
+        ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[cow1.state], cow1Box.w,cow1Box.h);
+        ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[bevo.state], bevoBox.w,bevoBox.h);
         semaphore = 0;
       }
     }
@@ -436,7 +439,6 @@ int main(void){ // final main
         semaphore = 0;
       }
     }
-
     if ((gameRound >= 15 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
       // win/lose screen
       if (cow1.health == 0) {
