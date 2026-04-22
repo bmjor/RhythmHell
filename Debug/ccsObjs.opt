@@ -2,7 +2,6 @@
 "./Arabic.o"
 "./Chinese.o"
 "./Clock.o"
-"./DAC.o"
 "./DAC5.o"
 "./LED.o"
 "./Lab9Main.o"
