@@ -347,13 +347,40 @@ uint8_t currentPlayer = 1;
 uint32_t globalcountr;
 uint8_t currNote = 0;
 uint32_t window = 50;//flexible
-uint32_t pbwindow = 25;//half of window. used for gamestate 0
+uint32_t pbwindow = 40;//half of window. used for gamestate 0
 uint32_t noteArrayLen = 19; //max length - 1
-uint32_t noteArray[15][20];// todo: initialize 
+// uint32_t noteArray[15][20];// todo: initialize 
+// int16_t noteArray[12][16];// todo: initialize
+int16_t noteArray[12][20] = {// Level 0
+        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 1
+        {10, 250, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 2
+        {10, 250, 375, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 3
+        {10, 125, 250, 500, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 4
+        {10, 125, 375, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 5
+        {125, 375, 625, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 6
+        {10, 62, 188, 250, 375, 500, 562, 688, 750, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 7
+        {125, 250, 333, 416, 625, 688, 750, 833, 916, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 8
+        {125, 375, 438, 500, 600, 700, 800, 900, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 9
+        {10, 111, 222, 333, 444, 555, 666, 777, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 10
+        {175, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        // Level 11
+        {10, 62, 125, 188, 250, 312, 375, 438, 500, 562, 625, 688, 750, 812, 875, 938, -1, -1, -1, -1}
+      };
 uint32_t watchrr = 0;
 uint8_t supertempscore =0;
 uint8_t lastpause = 0;
-#define defaultHealth 50 //can change later
+uint8_t soundtest = 0;
+#define defaultHealth 5000 //can change later
 int main_gamestate1(void) {
   uint8_t lastwatch = 0;
   //
@@ -482,7 +509,7 @@ int main_gamestate1(void) {
 
 
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
-int main5(void){ // final main
+int main(void){ // final main
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
@@ -495,26 +522,28 @@ int main5(void){ // final main
   Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
-  noteArray[0][0] = 100;
-  noteArray[0][1] = 150;
-  noteArray[0][2] = 200;
-  noteArray[0][3] = 250;
-  noteArray[0][4] = 300;
-  noteArray[0][5] = 350;
-  noteArray[0][6] = 400;
-  noteArray[0][7] = 450;
-  noteArray[0][8] = 500;
-  noteArray[0][9] = -1;
-  noteArray[1][0] = 200;
-  noteArray[1][1] = 333;
-  noteArray[1][2] = 555;
-  noteArray[1][3] = 800;
-  noteArray[1][4] = -1;
-  noteArray[2][0] = 350;
-  noteArray[2][1] = 800;
-  noteArray[2][2] = -1;
-  noteArray[3][0] = 500;
-  noteArray[3][1] = -1;
+  // noteArray[0][0] = -1;
+  // noteArray[1][0] = 100;
+  // noteArray[1][1] = 150;
+  // noteArray[1][2] = 200;
+  // noteArray[1][3] = 250;
+  // noteArray[1][4] = 300;
+  // noteArray[1][5] = 350;
+  // noteArray[1][6] = 400;
+  // noteArray[1][7] = 450;
+  // noteArray[1][8] = 500;
+  // noteArray[1][9] = -1;
+  // noteArray[2][0] = 200;
+  // noteArray[2][1] = 333;
+  // noteArray[2][2] = 555;
+  // noteArray[2][3] = 800;
+  // noteArray[2][4] = -1;
+  // noteArray[3][0] = 350;
+  // noteArray[3][1] = 800;
+  // noteArray[3][2] = -1;
+  // noteArray[4][0] = 500;
+  // noteArray[4][1] = -1;//soundtest should be 16
+
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
   TimerG0_IntArm(40000, 4, 1); // 500hz
 
@@ -591,7 +620,7 @@ int main5(void){ // final main
         semaphore = 0;
       }
     }
-    if ((gameRound >= 15 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
+    if ((gameRound >= 5 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
       // win/lose screen
       if (cow1.health == 0) {
         if (gameMode == 1){
@@ -764,7 +793,6 @@ watchrr = IndexOnce;
         else{
           bevo.state = 0;
         }
-      //setup main testcase and debug after 
     }
     } 
 
@@ -787,7 +815,7 @@ watchrr = IndexOnce;
         bevo.state = 2;
 //          Sound_Cow2Hurt(); MISSED NOTE COW 1 DUMMY FUNC
       }
-      currNote ++;
+      currNote++;
     }//detecting inputs
     if((Switch_In() & currentPlayer)){ //p1 = binary 01, p2 = binary 10
       if(!laststate){  
@@ -839,6 +867,7 @@ watchrr = IndexOnce;
         bevo.state = 1;
         if (globalcountr==IndexOnce){
         Sound_Cow2();
+        soundtest++;
 
         }
         else if(globalcountr==IndexOnce+pbwindow){
