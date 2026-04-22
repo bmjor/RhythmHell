@@ -333,8 +333,11 @@ int main4(void){ uint32_t last=0,now;
 
 
 sprite_t cow1;
-sprite_t cow2;
+//sprite_t cow2;
 sprite_t bevo;
+sprite_t cow1Box;
+sprite_t bevoBox;
+
 uint8_t semaphore; 
 uint8_t gameMode; // 1 for 1 player mode, 2 for 2 player mode
 uint8_t gameRound; // index for 2D array of rounds
@@ -357,12 +360,12 @@ int main(void){ // final main
   ADCinit();     //PB18 = ADC1 channel 5, slidepot
   Switch_Init(); // initialize switches
   LED_Init();    // initialize LED
-  //Sound_Init();  // initialize sound
+  Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
   //TimerG0_IntArm(40000, 4, 1); // 500hz
-
+  
   while(1){
     if (paused) {
       __disable_irq();
@@ -394,8 +397,11 @@ int main(void){ // final main
       cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = 65535, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
       bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = 65535, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
       
-      // JUSTIN: Ditto for the start screen.
-      // ST7735_DrawBitmap();
+      cow1Box = (sprite_t){.x = 15, .y = 160, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
+      bevoBox = (sprite_t){.x = 95, .y = 160, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
+            // JUSTIN: Ditto for the start screen.
+      //ST7735_DrawBitmap(0, 128, p1WinScreen, 160, 128); // temp
+
       
       ST7735_FillScreen(ST7735_WHITE); // temp, remove
 
@@ -467,7 +473,6 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
     if (numBeats >= 4) {
-
       globalcountr = 0;
       currNote = 0;
       if (gameMode == 1) {
@@ -495,13 +500,19 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
       
     }
     else {
-      buffer = Convert(ADCin());
       
       if (counter == 0) {
-        //counter = 30; //change to buffer
-        counter = buffer;
+        if (gameMode == 2) { 
+          buffer = Convert(ADCin()); // variable tempo for two player mode
+          counter = buffer;
+        }
+        else { //disable variable tempo for single player mode, fixed at 120 bpm (2 beats per second)
+          counter = 25;
+        }
+
         numBeats++;
         //cow1.y += 1;
+        
         Sound_Beat();
       }
       else {
