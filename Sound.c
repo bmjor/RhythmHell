@@ -14,9 +14,16 @@
 //#include "FIFO2.h"
 
 #define BEATLEN 8996
-#define COW1LEN 10632
-#define COW2LEN 10632
-//#define COW2LEN 9450
+//#define COW1LEN 10632
+// #define COW1LEN  6104
+// #define COW2LEN  6104
+
+#define COW1LEN  1745
+#define COW2LEN  2493
+
+
+// #define COW1LEN  3686
+// #define COW2LEN  3686
 #define ONELEN 3686
 #define TWOLEN 2621
 #define THREELEN 1966
@@ -66,14 +73,16 @@ void SysTick_Handler(void){ // called at 11 kHz
     active_streams++;
   }
   if (cow1Index < COW1LEN) {
-    stream2 = cow_high[cow1Index];
+    //stream2 = cow_high[cow1Index]; // switch back to cow_high
+    stream2 = moo2[cow1Index]; // switch back to cow_high
     cow1Index++;
     active_streams++;
   }
   if (cow2Index < COW2LEN) {
-    stream3 = cow_high[cow2Index];
+    //stream3 = cow_high[cow2Index]; // switch back to cow_high
+    stream3 = moo1[cow2Index]; // switch back to cow_
     cow2Index++;
-    active_streams++;
+    active_streams++; 
   }
   if (oneIndex < ONELEN) {
     stream3 = one[oneIndex];

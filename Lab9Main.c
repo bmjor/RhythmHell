@@ -510,7 +510,6 @@ int main(void){ // final main
 
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
   TimerG0_IntArm(40000, 2, 0); // 500hz //40000
-  
   while(1){
     if (drawBox == 1) {
       ST7735_FillRect(60, 30, 30, 30, ST7735_WHITE);
@@ -568,9 +567,7 @@ int main(void){ // final main
       }
       else{
         ST7735_SetCursor(7, 9);
-        ST7735_OutString("Press pause");
-        ST7735_SetCursor(7, 10);
-        ST7735_OutString("for Chinese");
+        ST7735_OutString("Pause=Chinese");
       }
       while(Switch_In()!=0){//init debounce
 
@@ -602,6 +599,7 @@ int main(void){ // final main
       ST7735_FillScreen(ST7735_WHITE);
       ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
       ST7735_DrawBitmap(90, 160, box_orange, 60,60);
+      //Sound_Cow1();
       Clock_Delay1ms(50);
       __enable_irq();
     }
@@ -609,18 +607,7 @@ int main(void){ // final main
       // one player mode
       if (semaphore) {
         //update display
-        if(currentPlayer==1){
-          ST7735_DrawCharS(54, 30, '1', ST7735_ORANGE, ST7735_WHITE, 2); // fix
-        }
-        else{
-          ST7735_DrawCharS(54, 30, '2', ST7735_ORANGE, ST7735_WHITE, 2); // fix
-        }
-        if(gameState ==2){
-          ST7735_DrawCharS(64, 30, 'M', ST7735_ORANGE, ST7735_WHITE, 2); // fix
-        }
-        else if(gameState ==1){
-          ST7735_DrawCharS(64, 30, 'P', ST7735_ORANGE, ST7735_WHITE, 2); // fix
-        }
+
         ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
         ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
         //ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[cow1.state], cow1Box.w,cow1Box.h);
@@ -648,6 +635,7 @@ int main(void){ // final main
       __disable_irq();
       while (Switch_In() != 0) {
       }
+      ST7735_SetCursor(64, 40);
       if (cow1.health == 0) {
         if (gameMode == 1){
         ST7735_FillScreen(ST7735_RED);
@@ -775,7 +763,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
       }
       
     }
-    else {
+    //else {
       if (counter == 0) { // ONE BEAT HAS ELAPSED
         if (cow1.health < defaultHealth) {
           cow1.health++;
@@ -804,6 +792,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
         }
         else {
           Sound_Beat();
+          //Sound_Cow1();
         }
         numBeats++;
         //cow1.y += 1;
@@ -827,7 +816,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
 
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
   }
-}
+
 
 // switches run at 500hz
 void TIMG0_IRQHandler(void) {
@@ -894,7 +883,6 @@ watchrr = IndexOnce;
           if((!laststate)&&(currNote!=noteArrayLen)){
             noteArray[gameRound][currNote] = globalcountr;
             currNote++;
-            
           }
         }
         
