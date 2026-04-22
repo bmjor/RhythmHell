@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := D:/ti/ccs2026/ccs/tools/compiler/ti-cgt-armllvm_4.0.4.LTS
+CG_TOOL_ROOT := C:/ti/ccs2040/ccs/tools/compiler/ti-cgt-armllvm_4.0.4.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
@@ -14,7 +14,6 @@ ORDERED_OBJS += \
 "./Arabic.o" \
 "./Chinese.o" \
 "./Clock.o" \
-"./DAC.o" \
 "./DAC5.o" \
 "./LED.o" \
 "./Lab9Main.o" \
@@ -138,29 +137,29 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-RhythmHell.out 
+ECE319K_Lab9.out 
 
 EXE_OUTPUTS__QUOTED += \
-"RhythmHell.out" 
+"ECE319K_Lab9.out" 
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "RhythmHell.out"
+	@$(MAKE) --no-print-directory -Onone "ECE319K_Lab9.out"
 
 # Tool invocations
-RhythmHell.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+ECE319K_Lab9.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"D:/ti/ccs2026/ccs/tools/compiler/ti-cgt-armllvm_4.0.4.LTS/bin/tiarmclang.exe" -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb -O0 -D__MSPM0G3507__ -gdwarf-3 -Wl,-m"RhythmHell.map" -Wl,--heap_size=512 -Wl,--stack_size=512 -Wl,-i"D:/MSPM0_ValvanoWare/RhythmHell/Debug/syscfg" -Wl,-i"D:/ti/ccs2026/ccs/tools/compiler/ti-cgt-armllvm_4.0.4.LTS/lib" -Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections -Wl,--xml_link_info="RhythmHell_linkInfo.xml" -Wl,--rom_model -o "RhythmHell.out" $(ORDERED_OBJS)
+	"C:/ti/ccs2040/ccs/tools/compiler/ti-cgt-armllvm_4.0.4.LTS/bin/tiarmclang.exe" -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb -O0 -D__MSPM0G3507__ -gdwarf-3 -Wl,-m"ECE319K_Lab9.map" -Wl,--heap_size=512 -Wl,--stack_size=512 -Wl,-i"C:/Users/brend/Downloads/MSPM0_ValvanoWare/ECE319K_Lab9/Debug/syscfg" -Wl,-i"C:/ti/ccs2040/ccs/tools/compiler/ti-cgt-armllvm_4.0.4.LTS/lib" -Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections -Wl,--xml_link_info="ECE319K_Lab9_linkInfo.xml" -Wl,--rom_model -o "ECE319K_Lab9.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "ADC1.o" "Arabic.o" "Chinese.o" "Clock.o" "DAC.o" "DAC5.o" "LED.o" "Lab9Main.o" "LaunchPad.o" "SPI.o" "ST7735.o" "SmallFont.o" "Sound.o" "Switch.o" "TExaS.o" "Timer.o" "images\pipedreams\PipeSound.o" "ticlang\startup_mspm0g3507_ticlang.o" 
-	-$(RM) "ADC1.d" "Arabic.d" "Chinese.d" "Clock.d" "DAC.d" "DAC5.d" "LED.d" "Lab9Main.d" "LaunchPad.d" "SPI.d" "ST7735.d" "SmallFont.d" "Sound.d" "Switch.d" "TExaS.d" "Timer.d" "images\pipedreams\PipeSound.d" "ticlang\startup_mspm0g3507_ticlang.d" 
+	-$(RM) "ADC1.o" "Arabic.o" "Chinese.o" "Clock.o" "DAC5.o" "LED.o" "Lab9Main.o" "LaunchPad.o" "SPI.o" "ST7735.o" "SmallFont.o" "Sound.o" "Switch.o" "TExaS.o" "Timer.o" "images\pipedreams\PipeSound.o" "ticlang\startup_mspm0g3507_ticlang.o" 
+	-$(RM) "ADC1.d" "Arabic.d" "Chinese.d" "Clock.d" "DAC5.d" "LED.d" "Lab9Main.d" "LaunchPad.d" "SPI.d" "ST7735.d" "SmallFont.d" "Sound.d" "Switch.d" "TExaS.d" "Timer.d" "images\pipedreams\PipeSound.d" "ticlang\startup_mspm0g3507_ticlang.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

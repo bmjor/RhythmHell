@@ -487,6 +487,7 @@ uint32_t window = 100; //testval
 //semaphore for semaphore done
 //global player is currentPlayer
 void TIMG0_IRQHandler(void) {
+<<<<<<< HEAD
   //todo: testcases for main, other sprite stuff
   if((TIMG0->CPU_INT.IIDX) == 1){ 
 if(Switch_In()&0x4){
@@ -686,3 +687,10 @@ uint32_t IndexOnce = noteArray[gameRound][currNote];
 
   }
 }
+=======
+  if((TIMG12->CPU_INT.IIDX) == 1){ 
+
+
+  }
+}
+>>>>>>> parent of c4c2f9a (added timg0 input logic. testcases not yet added)
