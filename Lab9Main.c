@@ -16,15 +16,15 @@
 #include "../inc/DAC.h"
 //#include "../inc/Arabic.h"
 #include "Chinese.h"
-#include "SmallFont.h"
-#include "LED.h"
+//#include "SmallFont.h"
+//#include "LED.h"
 #include "Switch.h"
 #include "Sound.h"
 #include "images/images.h"
 
 
 Chinese_t ChineseChars[] ={
-  ying1, zhong, wen, kai, shi1, zan, ting, hui, fu, dan, shuan, ren, mo, shi1, ni, ying2, shu, le, wan, jia, yi, er, null
+  ying1, zhong, wen, kai, shi1, zan, ting, hui, fu, dan, shuan, ren, mo, shi1, ni, ying2, shu, le, wan, jia, yi, er, yao, yong, guan, he, tui, chu, dao, cai, huo, zhe,null
 };
 Chinese_t EnglishSel[] = {ying1, wen, slash, null}; //slash between en and zh
 Chinese_t ChineseSel[] = {zhong, wen,null};
@@ -37,6 +37,8 @@ Chinese_t WinManual[] = {ni, ying2,le, ex, null}; //add an exclamation
 Chinese_t LoseManual[] = {ni, shu, le, ex, null};//add exclamation
 Chinese_t Player1Wins[] = {wan, jia, yi, ying2, le, ex, null}; //add exclamation
 Chinese_t Player2Wins[] = {wan, jia, er, ying2, le,ex, null};//add exclamation
+Chinese_t pausetochoose[] = {yao, ying1, wen, yong, zan, ting, kai, guan,null};
+Chinese_t gotohome[] = {yao, tui, chu, hui, jia, yong, wan,jia, huo,zhe, wan,jia,er ,null};
 
 //********ST7735_OutStringLanguage*****************
 // Print a string of characters to the ST7735 LCD in either English or Mandarin Chinese
@@ -67,32 +69,32 @@ void PLL_Init(void){ // set phase lock loop (PLL)
   // Clock_Init40MHz(); // run this line for 40MHz
   Clock_Init80MHz(0);   // run this line for 80MHz
 }
-/*
-Arabic_t ArabicAlphabet[]={
-alif,ayh,baa,daad,daal,dhaa,dhaal,faa,ghayh,haa,ha,jeem,kaaf,khaa,laam,meem,noon,qaaf,raa,saad,seen,sheen,ta,thaa,twe,waaw,yaa,zaa,space,dot,null1
-};
 
-Arabic_t Hello[]={alif,baa,ha,raa,meem,null1}; // hello
-Arabic_t WeAreHonoredByYourPresence[]={alif,noon,waaw,ta,faa,raa,sheen,null}; // we are honored by your presence
-int main0(void){ // main 0, demonstrate Arabic output
-  Clock_Init80MHz(0);
-  LaunchPad_Init();
-  ST7735_InitR(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
-  ST7735_FillScreen(ST7735_WHITE);
-  Arabic_SetCursor(0,15);
-  Arabic_OutString(Hello);
-  Arabic_SetCursor(0,31);
-  Arabic_OutString(WeAreHonoredByYourPresence);
-  Arabic_SetCursor(0,63);
-  Arabic_OutString(ArabicAlphabet);
-  while(1){
-  }
-}
+// Arabic_t ArabicAlphabet[]={
+// alif,ayh,baa,daad,daal,dhaa,dhaal,faa,ghayh,haa,ha,jeem,kaaf,khaa,laam,meem,noon,qaaf,raa,saad,seen,sheen,ta,thaa,twe,waaw,yaa,zaa,space,dot,null1
+// };
+
+// Arabic_t Hello[]={alif,baa,ha,raa,meem,null1}; // hello
+// Arabic_t WeAreHonoredByYourPresence[]={alif,noon,waaw,ta,faa,raa,sheen,null}; // we are honored by your presence
+// int main0(void){ // main 0, demonstrate Arabic output
+//   Clock_Init80MHz(0);
+//   LaunchPad_Init();
+//   ST7735_InitR(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
+//   ST7735_FillScreen(ST7735_WHITE);
+//   Arabic_SetCursor(0,15);
+//   Arabic_OutString(Hello);
+//   Arabic_SetCursor(0,31);
+//   Arabic_OutString(WeAreHonoredByYourPresence);
+//   Arabic_SetCursor(0,63);
+//   Arabic_OutString(ArabicAlphabet);
+//   while(1){
+//   }
+// }
 
 
-*/
-//Chinese_t GameStrings[][] = {{EnglishSel, ChineseSel, Start, Pause, Resume, ManualMode, MultiplayerMode, WinManual, LoseManual, Player1Wins, Player2Wins},
-   //                         {}};
+
+// Chinese_t GameStrings[][] = {{EnglishSel, ChineseSel, Start, Pause, Resume, ManualMode, MultiplayerMode, WinManual, LoseManual, Player1Wins, Player2Wins},
+//                            {}};
 
 int main0cn(void){ // main 0mod but for chiense
   Clock_Init80MHz(0);
@@ -212,19 +214,6 @@ int main1(void){ // main1
   }
 }
 
-struct sprite {
-  int32_t x;      // x coordinate
-  int32_t y;      // y coordinate
-  const unsigned short *images[3];
-  uint8_t state; // index to the images
-  int16_t health;   //65535     
-  int32_t w; // width
-  int32_t h; // height
-  uint8_t needDraw; // true if need to draw
-};
-typedef struct sprite sprite_t;
-
-
 // use main2 to observe graphics
 int main2(void){ // main2
   __disable_irq();
@@ -277,7 +266,7 @@ int main3(void){ // main3
   PLL_Init(); // set bus speed
   LaunchPad_Init();
   Switch_Init(); // initialize switches
-  LED_Init(); // initialize LED
+  //LED_Init(); // initialize LED
   Sound_Init(); // 
   ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
   ST7735_FillScreen(ST7735_ORANGE);
@@ -312,7 +301,7 @@ int main4(void){ uint32_t last=0,now;
   PLL_Init(); // set bus speed
   LaunchPad_Init();
   Switch_Init(); // initialize switches
-  LED_Init(); // initialize LED
+  //LED_Init(); // initialize LED
   Sound_Init();  // initialize sound
   TExaS_Init(ADC0,6,0); // ADC1 channel 6 is PB20, TExaS scope
   __enable_irq();
@@ -332,6 +321,20 @@ int main4(void){ uint32_t last=0,now;
 }
 
 
+struct sprite {
+  int32_t x;      // x coordinate
+  int32_t y;      // y coordinate
+  const unsigned short *images[3];
+  uint8_t state; // index to the images
+  int16_t health;   //65535     
+  int32_t w; // width
+  int32_t h; // height
+  uint8_t needDraw; // true if need to draw
+};
+typedef struct sprite sprite_t;
+
+
+
 sprite_t cow1;
 //sprite_t cow2;
 sprite_t bevo;
@@ -346,6 +349,7 @@ uint8_t paused; // indicates whether game is paused or not
 uint8_t currentPlayer = 1; 
 uint32_t globalcountr;
 uint8_t currNote = 0;
+
 uint32_t window = 60;//flexible
 uint32_t pbwindow = 30;//half of window. used for gamestate 0
 uint32_t noteArrayLen = 19; //max length - 
@@ -353,38 +357,40 @@ uint32_t dist2nextnote = 100000;
 uint8_t chinese = 0;
 const char countOff[3] = {'3','2','1'};
 //ctrl f globals to go here
-// uint32_t noteArray[15][20];// todo: initialize 
-// int16_t noteArray[12][16];// todo: initialize
-int16_t noteArray[12][20] = {// Level 0
-        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+uint32_t haveipaused = 0;
+uint8_t supertempscore =0;
+uint8_t lastpause = 0;
+uint8_t soundtest = 0;
+uint8_t drawBox = 0;
+int16_t noteArray[11][20] = {// Level 0
+       // {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 1
-        {0, 250, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {10, 250, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 2
-        {0, 250, 375, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {10, 250, 375, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 3
-        {0, 125, 250, 500, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {10, 125, 250, 500, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 4
-        {0, 125, 375, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {10, 125, 375, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 5
         {125, 375, 625, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 6
-        {0, 62, 188, 250, 375, 500, 562, 688, 750, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {10, 62, 188, 250, 375, 500, 562, 688, 750, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 7
         {125, 250, 333, 416, 625, 688, 750, 833, 916, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 8
         {125, 375, 438, 500, 600, 700, 800, 900, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 9
-        {0, 111, 222, 333, 444, 555, 666, 777, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {10, 111, 222, 333, 444, 555, 666, 777, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 10
         {175, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 11
-        {0, 62, 125, 188, 250, 312, 375, 438, 500, 562, 625, 688, 750, 812, 875, 938, -1, -1, -1, -1}
+        {10, 62, 125, 188, 250, 312, 375, 438, 500, 562, 625, 688, 750, 812, 875, 938, -1, -1, -1, -1}
       };
+
+
 uint32_t watchrr = 0;
-uint8_t supertempscore =0;
-uint8_t lastpause = 0;
-uint8_t soundtest = 0;
-#define defaultHealth 5000 //can change later
+#define defaultHealth 99 //can change later
 int main_gamestate1(void) {
   uint8_t lastwatch = 0;
   //
@@ -464,53 +470,6 @@ int main_gamestate1(void) {
     }
 }
 }
-// int main(void){
-//   __disable_irq();
-//   ADCinit();
-//   PLL_Init(); // set bus speed
-//   LaunchPad_Init();
-//   Switch_Init(); // initialize switches
-//   LED_Init(); // initialize LED
-//   Sound_Init(); // 
-//   ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
-//   ST7735_FillScreen(ST7735_ORANGE);
-//   ST7735_SetRotation(1);
-//   noteArray[0][0] = 100;
-//   noteArray[0][1] = 150;
-//   noteArray[0][2] = 200;
-//   noteArray[0][3] = 250;
-//   noteArray[0][4] = 300;
-//   noteArray[0][5] = 350;
-//   noteArray[0][6] = 400;
-//   noteArray[0][7] = 450;
-//   noteArray[0][8] = 500;
-//   noteArray[0][9] = -1;
-//   noteArray[1][0] = 200;
-//   noteArray[1][1] = 333;
-//   noteArray[1][2] = 555;
-//   noteArray[1][3] = 800;
-//   noteArray[1][4] = -1;
-//   noteArray[2][0] = 350;
-//   noteArray[2][1] = 800;
-//   noteArray[2][2] = -1;
-//   noteArray[3][0] = 500;
-//   noteArray[3][1] = -1;
-//   globalcountr  = 0;
-//   currNote = 0;
-//   cow1 = (sprite_t){.x = 25, .y = cow1.y, .w = 45, .h = 29, .health = defaultHealth, .images = {Cow1N, Cow1S, 0}, .state = 0};
-//   bevo = (sprite_t){.x = 80, .y = cow1.y, .w = 65, .h = 43, .health = defaultHealth, .images = {bevoN, bevoS, 0}, .state = 0};
-//   cow1Box = (sprite_t){.x = 15, .y = cow1Box.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
-//   bevoBox = (sprite_t){.x = 95, .y = bevoBox.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
-//   gameRound = 0;
-//   gameState = 0;
-//   gameMode = 1;
-//   currentPlayer = 1;
-//   TimerG0_IntArm(40000, 4, 1); // 500hz
-//   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
-//   __enable_irq();
-  
-// }
-
 
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
 int main(void){ // final main
@@ -519,12 +478,13 @@ int main(void){ // final main
   LaunchPad_Init();
   ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
   ST7735_FillScreen(ST7735_ORANGE);
-  ST7735_SetRotation(1);
+  ST7735_SetRotation(1); 
   ADCinit();     //PB18 = ADC1 channel 5, slidepot
   Switch_Init(); // initialize switches
-  LED_Init();    // initialize LED
+  //LED_Init();    // initialize LED
   Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
+
     // initialize interrupts on TimerG12 at 30 Hz
   // noteArray[0][0] = -1;
   // noteArray[1][0] = 100;
@@ -549,28 +509,40 @@ int main(void){ // final main
   // noteArray[4][1] = -1;//soundtest should be 16
 
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
-  TimerG0_IntArm(40000, 2, 0); // 500hz
-
+  TimerG0_IntArm(40000, 2, 0); // 500hz //40000
+  
   while(1){
+    if (drawBox == 1) {
+      ST7735_FillRect(60, 30, 30, 30, ST7735_WHITE);
+      drawBox = 0;
+    }
     if (paused) {
       __disable_irq();
       uint8_t tempGameMode = gameMode;
       // draw pause screen
-
-      // JUSTIN: make pause screen, and indicate to user somehow that rehitting pause button will resume, and any other button will return to main menu/start screen  
-      // ST7735_DrawBitmap();
+      while (Switch_In() != 0) {
+      }
       ST7735_FillScreen(ST7735_WHITE); // temp, remove 
       ST7735_DrawBitmap(0, 53, namecard, 160,22);
-      ST7735_SetCursor(70, 75); //slight offcenter
-      
-
-      // Pause screen logic(Already done)
+      if(chinese){
+      Chinese_SetCursor(7, 6); //slight offcenter // temp, remove 
+      Chinese_OutString(Pause);
+      }
+      else{
+      ST7735_SetCursor(7, 6); //slight offcenter // temp, remove 
+      ST7735_OutString("Paused");
+      }
       while (Switch_In() == 0) {
       }
+      // ST7735_DrawBitmap();
+      //ST7735_DrawBitmap(0, 128, pauseScreen, 160, 128); 
+      //while (Switch_In() != 0) {}
+      // Pause screen logic(Already done)
+
       uint32_t press = Switch_In();
       if (press == 4) {
-        ST7735_FillScreen(ST7735_WHITE); // temp, remove 
-        gameMode = tempGameMode;
+      ST7735_FillRect(0, 31, 160, 22, ST7735_WHITE);
+      gameMode = tempGameMode;
       }
       else {
         gameMode = 0; // if return to home is pressed, set gameMode = 0
@@ -583,28 +555,54 @@ int main(void){ // final main
     else if (gameMode == 0) {
       __disable_irq();
       // start screen
-      cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = defaultHealth, .needDraw = 1, .images = {Cow1N, Cow1S, 0}, .state = 0}; // p1 cow
-      bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = defaultHealth, .needDraw = 1, .images = {bevoN, bevoS, 0}, .state = 0};  // bevo
+      cow1 = (sprite_t){.x = 25, .y = 100, .w = 45, .h = 29, .health = defaultHealth, .needDraw = 1, .images = {Cow1N, Cow1S, Cow1F}, .state = 0}; // p1 cow
+      bevo = (sprite_t){.x = 80, .y = 100, .w = 65, .h = 43, .health = defaultHealth, .needDraw = 1, .images = {bevoN, bevoS, BevoF}, .state = 0};  // bevo
+      ST7735_DrawBitmap(0, 0, namecard, 160,22);
+      ST7735_DrawBitmap(0, 32, namecard, 160,22);
+      ST7735_DrawBitmap(0, 64, namecard, 160,22);
+      ST7735_DrawBitmap(0, 96, namecard, 160,22);
+      ST7735_DrawBitmap(0, 128, namecard, 160,22);
+      if(chinese){
+        Chinese_SetCursor(42, 98);
+        Chinese_OutString(pausetochoose);
+      }
+      else{
+        ST7735_SetCursor(7, 9);
+        ST7735_OutString("Press pause");
+        ST7735_SetCursor(7, 10);
+        ST7735_OutString("for Chinese");
+      }
+      while(Switch_In()!=0){//init debounce
+
+      }
+      while(Switch_In() ==0){
+
+      }
+      uint32_t press = Switch_In();
+
+      if(Switch_In()==4){
+        chinese^=0x1; //toggle langauge
+        while(Switch_In()!=0){}
+        continue;
+      }
       
-      cow1Box = (sprite_t){.x = 15, .y = 160, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
-      bevoBox = (sprite_t){.x = 95, .y = 160, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
+      // cow1Box = (sprite_t){.x = 15, .y = 160, .w = 60, .h = 60, .health = defaultHealth, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
+      // bevoBox = (sprite_t){.x = 95, .y = 160, .w = 60, .h = 60, .health = defaultHealth, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
             // JUSTIN: Ditto for the start screen.
       //ST7735_DrawBitmap(0, 128, p1WinScreen, 160, 128); // temp
 
-      
-     ST7735_FillScreen(ST7735_GREEN); // temp, remove
+   //   ST7735_DrawBitmap(0, 50, namecard, 160, 22); // temp
+      //initialize var
+      gameMode = press;
 
-        //wait for player input to choose mode
-      while (Switch_In() == 0 || Switch_In() == 4) {
-      }
-      gameMode = Switch_In();
       gameState = 3; // set gameState to 3 to trigger 4 beat count in
+      gameRound = 0;
       while (Switch_In() != 0) {}
       //draw background
       ST7735_FillScreen(ST7735_WHITE);
       ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
       ST7735_DrawBitmap(90, 160, box_orange, 60,60);
-
+      Clock_Delay1ms(50);
       __enable_irq();
     }
     
@@ -625,30 +623,95 @@ int main(void){ // final main
         }
         ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
         ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
-        ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[0], cow1Box.w,cow1Box.h);
-        ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[0], bevoBox.w,bevoBox.h);
+        //ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[cow1.state], cow1Box.w,cow1Box.h);
+        //ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[bevo.state], bevoBox.w,bevoBox.h);
         ST7735_DrawBitmap(dist2nextnote+50, 20, note_1x, 6,20);
-        ST7735_DrawBitmap(dist2nextnote+70, 20, note_white, 6,20);
-
-          
+        ST7735_DrawBitmap(dist2nextnote+70, 20, note_white, 6,20); //notes
         semaphore = 0;
       }
-
-    if ((gameRound >= 12 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
+    }
+    if (gameMode == 2) {
+      // two player mode
+      if (semaphore) {
+        //update display
+        ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
+        ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
+        ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[cow1.state], cow1Box.w,cow1Box.h);
+        ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[bevo.state], bevoBox.w,bevoBox.h); // change later if sprite changes
+        ST7735_DrawBitmap(dist2nextnote+50, 20, note_1x, 6,20);
+        ST7735_DrawBitmap(dist2nextnote+70, 20, note_white, 6,20);
+        semaphore = 0;
+      }
+    }
+    if ((gameRound >= 12 && gameMode == 1) || cow1.health <= 0 || bevo.health <= 0) { // edit to be number of rounds
       // win/lose screen
+      __disable_irq();
+      while (Switch_In() != 0) {
+      }
       if (cow1.health == 0) {
         if (gameMode == 1){
+        ST7735_FillScreen(ST7735_RED);
+        ST7735_DrawBitmap(0, 0, namecard, 160,22);
+        ST7735_DrawBitmap(0, 32, namecard, 160,22);
+        ST7735_DrawBitmap(0, 64, namecard, 160,22);
+        ST7735_DrawBitmap(0, 96, namecard, 160,22);
+        ST7735_DrawBitmap(0, 128, namecard, 160,22);
+        if(chinese){
+          Chinese_SetCursor(42, 98);
+          Chinese_OutString(LoseManual);
+        }
+        else{
+          ST7735_SetCursor(7, 9);
           ST7735_OutString("You Lose!");
         }
+        }
         else {
+          ST7735_FillScreen(ST7735_GREEN);
+        ST7735_DrawBitmap(0, 0, namecard, 160,22);
+        ST7735_DrawBitmap(0, 32, namecard, 160,22);
+        ST7735_DrawBitmap(0, 64, namecard, 160,22);
+        ST7735_DrawBitmap(0, 96, namecard, 160,22);
+        ST7735_DrawBitmap(0, 128, namecard, 160,22);
+        if(chinese){
+          Chinese_SetCursor(42, 98);
+          Chinese_OutString(Player2Wins);
+        }
+        else{
+          ST7735_SetCursor(7, 9);
+          ST7735_OutString("P2 Wins!");
+        }
           ST7735_OutString("P2 Wins!");
         }
       }
       else if (bevo.health == 0) {
-        ST7735_OutString("P1 Wins!");
+                ST7735_DrawBitmap(0, 0, namecard, 160,22);
+        ST7735_DrawBitmap(0, 32, namecard, 160,22);
+        ST7735_DrawBitmap(0, 64, namecard, 160,22);
+        ST7735_DrawBitmap(0, 96, namecard, 160,22);
+        ST7735_DrawBitmap(0, 128, namecard, 160,22);
+        if(chinese){
+          Chinese_SetCursor(42, 98);
+          Chinese_OutString(Player1Wins);
+        }
+        else{
+          ST7735_SetCursor(7, 9);
+          ST7735_OutString("P1 Wins!");
+        }
       }
       else if (gameRound >= 15 && gameMode == 1) {
-        ST7735_OutString("You Win!");
+                ST7735_DrawBitmap(0, 0, namecard, 160,22);
+        ST7735_DrawBitmap(0, 32, namecard, 160,22);
+        ST7735_DrawBitmap(0, 64, namecard, 160,22);
+        ST7735_DrawBitmap(0, 96, namecard, 160,22);
+        ST7735_DrawBitmap(0, 128, namecard, 160,22);
+        if(chinese){
+          Chinese_SetCursor(42, 98);
+          Chinese_OutString(WinManual);
+        }
+        else{
+          ST7735_SetCursor(7, 9);
+          ST7735_OutString("You Win!");
+        }
       }
 
       while (Switch_In() == 0) {
@@ -658,7 +721,7 @@ int main(void){ // final main
       while (Switch_In() != 0) {}
     }
     
-  }
+  
 }
 
 // games  engine runs at 50Hz
@@ -681,6 +744,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
       globalcountr = 0;
       currNote = 0;
       numBeats = 0; //reset number of beats 
+      drawBox = 1;
       if (gameMode == 1) { // if single player mode, cycle between states 0 and 1
         if (gameState == 0) {
           // reset global variables for new round
@@ -713,6 +777,9 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
     }
     else {
       if (counter == 0) { // ONE BEAT HAS ELAPSED
+        if (cow1.health < defaultHealth) {
+          cow1.health++;
+        }
         if (gameMode == 2) { 
           buffer = 25 + (ADCin()/100);//Convert(ADCin()); // variable tempo for two player mode
           counter = buffer;
@@ -723,11 +790,12 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
         if (gameState == 3) {
           Sound_Count(numBeats);
           if (numBeats < 3) {
-            ST7735_DrawCharS(64, 80, countOff[numBeats], ST7735_ORANGE, ST7735_WHITE, 10); // fix
+            ST7735_DrawCharS(70, 30, countOff[numBeats], ST7735_ORANGE, ST7735_WHITE, 2); // fix
           }
           else if (!chinese){
-            ST7735_SetCursor(64, 80);
-            ST7735_OutStringTransparent("GO");
+            ST7735_DrawCharS(64, 30, 'G', ST7735_ORANGE, ST7735_WHITE, 2); // fix
+            ST7735_DrawCharS(76, 30, 'O', ST7735_ORANGE, ST7735_WHITE, 2); // fix
+        
           }
           else {
             Chinese_SetCursor(64, 80);
@@ -768,14 +836,16 @@ void TIMG0_IRQHandler(void) {
   static uint8_t laststateforotherplayer = 0; 
   static uint8_t valid = 0;
   if((TIMG0->CPU_INT.IIDX) == 1){ 
-if((Switch_In()&0x4)&&!lastpause){
+if((Switch_In()==4)){
+  if(!lastpause){
   paused = 1;
+  haveipaused++;
+  }
   lastpause = 1;
 }
 else {
   lastpause = 0;//debouncing pause
 }
-
   //for when other player inputs
   if((Switch_In()&(currentPlayer^0x03))){
     if (currentPlayer==2){
@@ -807,8 +877,6 @@ dist2nextnote = IndexOnce - globalcountr;
 watchrr = IndexOnce;
 //gs2 -> 2nd player inputting
   if (gameState ==2){
-   // GlobalcurrArray = GlobalcurrArray%2; //0/1 i dont update the gameround 
-    //add stuff later for storing rhythm from othe rplayer// addded 
 
     if(Switch_In() & currentPlayer){
         if (currentPlayer==1){
@@ -853,12 +921,12 @@ watchrr = IndexOnce;
     else if ((globalcountr ==(IndexOnce+window))&&(IndexOnce!=-1)){//exiting hitwindow
       valid = 0;
       if (currentPlayer ==1){
-          cow1.health--;
+          cow1.health -= 5;
           cow1.state = 2;
 //          Sound_Cow1Hurt(); MISSED NOTE COW 1 DUMMY FUNC
       }
       else{
-        bevo.health--;
+        bevo.health-=5;
         bevo.state = 2;
 //          Sound_Cow2Hurt(); MISSED NOTE COW 1 DUMMY FUNC
       }
@@ -881,12 +949,12 @@ watchrr = IndexOnce;
                 }
         else{
           if(currentPlayer ==1){
-            cow1.health--;
+            cow1.health-= 5;
             cow1.state = 2;
 //          Sound_Cow1Hurt(); MISSED NOTE COW 1 DUMMY FUNC
                     }
           else{
-            bevo.health--;
+            bevo.health-=5;
             bevo.state = 2;
 //          Sound_Cow2Hurt(); MISSED NOTE COW 2 DUMMY FUNC
           }
