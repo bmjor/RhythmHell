@@ -1,0 +1,14 @@
+# TI Code Composer Studio build directories
+Debug/
+Release/
+
+# Language server cache
+.clangd/
+
+# Compiled objects and binaries
+*.out
+*.map
+*.o
+*.d
+*.hex
+*.bin
