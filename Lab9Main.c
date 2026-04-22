@@ -346,8 +346,8 @@ uint8_t paused; // indicates whether game is paused or not
 uint8_t currentPlayer = 1; 
 uint32_t globalcountr;
 uint8_t currNote = 0;
-uint32_t window = 50;//flexible
-uint32_t pbwindow = 40;//half of window. used for gamestate 0
+uint32_t window = 60;//flexible
+uint32_t pbwindow = 30;//half of window. used for gamestate 0
 uint32_t noteArrayLen = 19; //max length - 1
 // uint32_t noteArray[15][20];// todo: initialize 
 // int16_t noteArray[12][16];// todo: initialize
@@ -620,7 +620,7 @@ int main(void){ // final main
         semaphore = 0;
       }
     }
-    if ((gameRound >= 5 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
+    if ((gameRound >= 12 && gameMode == 1) || cow1.health == 0 || bevo.health == 0) { // edit to be number of rounds
       // win/lose screen
       if (cow1.health == 0) {
         if (gameMode == 1){
