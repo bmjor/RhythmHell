@@ -1,7 +1,6 @@
 # FIXED
 
-SmallFont.o: ../SmallFont.c \
- C:/Users/brend/Downloads/MSPM0_ValvanoWare/ECE319K_Lab9/SmallFont.h \
+SmallFont.o: ../SmallFont.c D:/MSPM0_ValvanoWare/RhythmHell/SmallFont.h \
  ../../inc/ST7735.h
-C:/Users/brend/Downloads/MSPM0_ValvanoWare/ECE319K_Lab9/SmallFont.h:
+D:/MSPM0_ValvanoWare/RhythmHell/SmallFont.h:
 ../../inc/ST7735.h:
