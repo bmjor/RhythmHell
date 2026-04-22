@@ -348,8 +348,50 @@ uint32_t pbwindow = 25;//half of window. used for gamestate 0
 uint32_t noteArrayLen = 19; //max length - 1
 uint32_t noteArray[15][20];// todo: initialize 
 
+
+int main/*_g0test*/(void) {
+  uint8_t gmtest = 0; //0 -> single player, 1 -> multiplayer. use for testing
+  //
+    __disable_irq();
+  PLL_Init(); // set bus speed
+  LaunchPad_Init();
+  Switch_Init(); // initialize switches
+  LED_Init(); // initialize LED
+  Sound_Init(); // 
+  ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
+  ST7735_FillScreen(ST7735_ORANGE);
+  ST7735_SetRotation(1);
+  noteArray[0][0] = 500;
+  noteArray[0][1] = 1000;
+  noteArray[0][2] = 1500;
+  noteArray[0][3] = -1;
+  globalcountr  = 0;
+  currNote = 0;
+  bevo.health = 10;
+  cow1.health = 10;
+  if (!gmtest){
+  gameRound = 0;
+  gameMode = 1; //testing single player
+  gameState = 0; //init @ gs0
+  currentPlayer = 1; //needed for single player
+  }
+  else if (gmtest){
+    gameRound = 0;
+    gameMode = 2;
+    gameState = 1; //init @gs1
+    currentPlayer = 1;
+  }
+  TimerG0_IntArm(40000, 4, 1); // 500hz
+  __enable_irq();
+  while(1){
+    
+  }
+}
+
+
+
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
-int main(void){ // final main
+int main5(void){ // final main
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
