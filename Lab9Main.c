@@ -348,33 +348,34 @@ uint32_t globalcountr;
 uint8_t currNote = 0;
 uint32_t window = 60;//flexible
 uint32_t pbwindow = 30;//half of window. used for gamestate 0
-uint32_t noteArrayLen = 19; //max length - 1
+uint32_t noteArrayLen = 19; //max length - 
+uint32_t dist2nextnote = 100000;
 // uint32_t noteArray[15][20];// todo: initialize 
 // int16_t noteArray[12][16];// todo: initialize
 int16_t noteArray[12][20] = {// Level 0
         {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 1
-        {10, 250, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {0, 250, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 2
-        {10, 250, 375, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {0, 250, 375, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 3
-        {10, 125, 250, 500, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {0, 125, 250, 500, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 4
-        {10, 125, 375, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {0, 125, 375, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 5
         {125, 375, 625, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 6
-        {10, 62, 188, 250, 375, 500, 562, 688, 750, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {0, 62, 188, 250, 375, 500, 562, 688, 750, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 7
         {125, 250, 333, 416, 625, 688, 750, 833, 916, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 8
         {125, 375, 438, 500, 600, 700, 800, 900, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 9
-        {10, 111, 222, 333, 444, 555, 666, 777, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        {0, 111, 222, 333, 444, 555, 666, 777, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 10
         {175, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         // Level 11
-        {10, 62, 125, 188, 250, 312, 375, 438, 500, 562, 625, 688, 750, 812, 875, 938, -1, -1, -1, -1}
+        {0, 62, 125, 188, 250, 312, 375, 438, 500, 562, 625, 688, 750, 812, 875, 938, -1, -1, -1, -1}
       };
 uint32_t watchrr = 0;
 uint8_t supertempscore =0;
@@ -608,6 +609,9 @@ int main(void){ // final main
         ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
         ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[cow1.state], cow1Box.w,cow1Box.h);
         ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[bevo.state], bevoBox.w,bevoBox.h);
+        ST7735_DrawBitmap(dist2nextnote, 20, note_1x, 6,20);
+        ST7735_DrawBitmap(dist2nextnote+20, 20, note_white, 6,20);
+
         semaphore = 0;
       }
     }
@@ -729,7 +733,7 @@ if((Switch_In()&0x4)&&!lastpause){
 else {
   lastpause = 0;//debouncing pause
 }
-  globalcountr++; 
+
   //for when other player inputs
   if((Switch_In()&(currentPlayer^0x03))){
     if (currentPlayer==2){
@@ -757,6 +761,7 @@ else{
 
 }
 uint32_t IndexOnce = noteArray[gameRound][currNote];
+dist2nextnote = IndexOnce - globalcountr;
 watchrr = IndexOnce;
 //gs2 -> 2nd player inputting
   if (gameState ==2){
@@ -886,4 +891,5 @@ watchrr = IndexOnce;
   bevo.y = 100 + (defaultHealth - bevo.health)*2;
   cow1Box.y =cow1.y +60;
   bevoBox.y =bevo.y + 60;
+  globalcountr++; 
 }
