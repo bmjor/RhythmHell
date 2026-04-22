@@ -352,8 +352,9 @@ uint32_t noteArrayLen = 19; //max length - 1
 uint32_t noteArray[15][20];// todo: initialize 
 uint32_t watchrr = 0;
 uint8_t supertempscore =0;
-#define defaultHealth 10 //can change later
-int main(void) {
+uint8_t lastpause = 0;
+#define defaultHealth 50 //can change later
+int main_gamestate1(void) {
   uint8_t lastwatch = 0;
   //
   __disable_irq();
@@ -378,8 +379,8 @@ int main(void) {
   // noteArray[0][9] = -1;
   globalcountr  = 0;
   currNote = 0;
-  cow1 = (sprite_t){.x = 25, .y = cow1.y, .w = 45, .h = 29, .health = 9, .images = {Cow1N, Cow1S, 0}, .state = 0};
-  bevo = (sprite_t){.x = 80, .y = cow1.y, .w = 65, .h = 43, .health = 9, .images = {bevoN, bevoS, 0}, .state = 0};
+  cow1 = (sprite_t){.x = 25, .y = cow1.y, .w = 45, .h = 29, .health = defaultHealth, .images = {Cow1N, Cow1S, 0}, .state = 0};
+  bevo = (sprite_t){.x = 80, .y = cow1.y, .w = 65, .h = 43, .health = defaultHealth, .images = {bevoN, bevoS, 0}, .state = 0};
   cow1Box = (sprite_t){.x = 15, .y = cow1Box.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
   bevoBox = (sprite_t){.x = 95, .y = bevoBox.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
   gameRound = 0;
@@ -432,7 +433,52 @@ int main(void) {
     }
 }
 }
-
+// int main(void){
+//   __disable_irq();
+//   ADCinit();
+//   PLL_Init(); // set bus speed
+//   LaunchPad_Init();
+//   Switch_Init(); // initialize switches
+//   LED_Init(); // initialize LED
+//   Sound_Init(); // 
+//   ST7735_InitPrintf(INITR_BLACKTAB); // INITR_REDTAB for AdaFruit, INITR_BLACKTAB for HiLetGo
+//   ST7735_FillScreen(ST7735_ORANGE);
+//   ST7735_SetRotation(1);
+//   noteArray[0][0] = 100;
+//   noteArray[0][1] = 150;
+//   noteArray[0][2] = 200;
+//   noteArray[0][3] = 250;
+//   noteArray[0][4] = 300;
+//   noteArray[0][5] = 350;
+//   noteArray[0][6] = 400;
+//   noteArray[0][7] = 450;
+//   noteArray[0][8] = 500;
+//   noteArray[0][9] = -1;
+//   noteArray[1][0] = 200;
+//   noteArray[1][1] = 333;
+//   noteArray[1][2] = 555;
+//   noteArray[1][3] = 800;
+//   noteArray[1][4] = -1;
+//   noteArray[2][0] = 350;
+//   noteArray[2][1] = 800;
+//   noteArray[2][2] = -1;
+//   noteArray[3][0] = 500;
+//   noteArray[3][1] = -1;
+//   globalcountr  = 0;
+//   currNote = 0;
+//   cow1 = (sprite_t){.x = 25, .y = cow1.y, .w = 45, .h = 29, .health = defaultHealth, .images = {Cow1N, Cow1S, 0}, .state = 0};
+//   bevo = (sprite_t){.x = 80, .y = cow1.y, .w = 65, .h = 43, .health = defaultHealth, .images = {bevoN, bevoS, 0}, .state = 0};
+//   cow1Box = (sprite_t){.x = 15, .y = cow1Box.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_charcoal}, .state = 0}; // p1 cow
+//   bevoBox = (sprite_t){.x = 95, .y = bevoBox.y, .w = 60, .h = 60, .health = 65535, .needDraw = 1, .images = {box_orange}, .state = 0}; // p1 cow
+//   gameRound = 0;
+//   gameState = 0;
+//   gameMode = 1;
+//   currentPlayer = 1;
+//   TimerG0_IntArm(40000, 4, 1); // 500hz
+//   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
+//   __enable_irq();
+  
+// }
 
 
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
@@ -449,6 +495,26 @@ int main5(void){ // final main
   Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
+  noteArray[0][0] = 100;
+  noteArray[0][1] = 150;
+  noteArray[0][2] = 200;
+  noteArray[0][3] = 250;
+  noteArray[0][4] = 300;
+  noteArray[0][5] = 350;
+  noteArray[0][6] = 400;
+  noteArray[0][7] = 450;
+  noteArray[0][8] = 500;
+  noteArray[0][9] = -1;
+  noteArray[1][0] = 200;
+  noteArray[1][1] = 333;
+  noteArray[1][2] = 555;
+  noteArray[1][3] = 800;
+  noteArray[1][4] = -1;
+  noteArray[2][0] = 350;
+  noteArray[2][1] = 800;
+  noteArray[2][2] = -1;
+  noteArray[3][0] = 500;
+  noteArray[3][1] = -1;
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
   TimerG0_IntArm(40000, 4, 1); // 500hz
 
@@ -625,8 +691,12 @@ void TIMG0_IRQHandler(void) {
   static uint8_t laststateforotherplayer = 0; 
   static uint8_t valid = 0;
   if((TIMG0->CPU_INT.IIDX) == 1){ 
-if(Switch_In()&0x4){
+if((Switch_In()&0x4)&&!lastpause){
   paused = 1;
+  lastpause = 1;
+}
+else {
+  lastpause = 0;//debouncing pause
 }
   globalcountr++; 
   //for when other player inputs
@@ -763,13 +833,13 @@ watchrr = IndexOnce;
   else if (gameState ==0){
     if(IndexOnce!=-1){
         //playback has playback cap dependent on window; might use a seperate var for this, tbd
-      if((globalcountr>=IndexOnce-pbwindow/2)&&(globalcountr<=IndexOnce+window)){//playing notes doesnt need to account for which player b/c only accessible from 1p
+      if((globalcountr>=IndexOnce)&&(globalcountr<=IndexOnce+pbwindow)){//playing notes doesnt need to account for which player b/c only accessible from 1p
         bevo.state = 1;
         if (globalcountr==IndexOnce){
         Sound_Cow2();
 
         }
-        else if(globalcountr==IndexOnce+window){
+        else if(globalcountr==IndexOnce+pbwindow){
         currNote++;
         }
       }
@@ -781,8 +851,8 @@ watchrr = IndexOnce;
 
 
   }
-  cow1.y = 100 + (defaultHealth - cow1.health)*10;
-  bevo.y = 100 + (defaultHealth - bevo.health)*10;
+  cow1.y = 100 + (defaultHealth - cow1.health)*2;
+  bevo.y = 100 + (defaultHealth - bevo.health)*2;
   cow1Box.y =cow1.y +60;
   bevoBox.y =bevo.y + 60;
 }

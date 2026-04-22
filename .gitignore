@@ -1,14 +1,7 @@
-# TI Code Composer Studio build directories
+# Ignore Clangd language server cache
+.clangd/
+*.idx
+
+# Ignore build output folders (you usually don't want to push these either!)
 Debug/
 Release/
-
-# Language server cache
-.clangd/
-
-# Compiled objects and binaries
-*.out
-*.map
-*.o
-*.d
-*.hex
-*.bin
