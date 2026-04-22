@@ -30,5 +30,6 @@ void Sound_Init(void);
 void Sound_Beat(void);
 void Sound_Cow1(void);
 void Sound_Cow2(void);
+void Sound_Count(uint8_t index);
 
 #endif
