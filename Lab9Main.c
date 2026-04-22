@@ -401,7 +401,6 @@ int main(void){ // final main
     // initialize interrupts on TimerG12 at 30 Hz
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
   TimerG0_IntArm(40000, 2, 0); // 500hz //40000
-  
   while(1){
     if (drawBox == 1) {
       ST7735_FillRect(60, 30, 30, 30, ST7735_WHITE);
@@ -458,6 +457,7 @@ int main(void){ // final main
       ST7735_FillScreen(ST7735_WHITE);
       ST7735_DrawBitmap(15, 160, box_charcoal, 60,60);
       ST7735_DrawBitmap(90, 160, box_orange, 60,60);
+      //Sound_Cow1();
       Clock_Delay1ms(50);
       __enable_irq();
     }
@@ -489,6 +489,7 @@ int main(void){ // final main
       __disable_irq();
       while (Switch_In() != 0) {
       }
+      ST7735_SetCursor(64, 40);
       if (cow1.health == 0) {
         if (gameMode == 1){
           ST7735_FillScreen(ST7735_RED);
@@ -568,7 +569,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
       }
       
     }
-    else {
+    //else {
       if (counter == 0) { // ONE BEAT HAS ELAPSED
         if (cow1.health < defaultHealth) {
           cow1.health++;
@@ -598,6 +599,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
         }
         else {
           Sound_Beat();
+          //Sound_Cow1();
         }
         numBeats++;
         //cow1.y += 1;
@@ -606,7 +608,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
       else {
         counter--;
       }
-    }
+    //}
     
     semaphore = 1;
 
@@ -683,7 +685,6 @@ uint32_t IndexOnce = noteArray[gameRound][currNote];
           if((!laststate)&&(currNote!=noteArrayLen)&&(globalcountr>window)){
             noteArray[gameRound][currNote] = globalcountr;
             currNote++;
-            
           }
         }
         
