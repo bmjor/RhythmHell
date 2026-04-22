@@ -403,7 +403,7 @@ int main(void){ // final main
       //ST7735_DrawBitmap(0, 128, p1WinScreen, 160, 128); // temp
 
       
-      ST7735_FillScreen(ST7735_WHITE); // temp, remove
+     ST7735_FillScreen(ST7735_WHITE); // temp, remove
 
         //wait for player input to choose mode
       while (Switch_In() == 0 || Switch_In() == 4) {
