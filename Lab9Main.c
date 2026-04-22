@@ -343,7 +343,9 @@ uint8_t paused; // indicates whether game is paused or not
 uint8_t currentPlayer = 1; 
 uint32_t globalcountr;
 uint8_t currNote = 0;
-
+uint32_t window = 50;//flexible
+uint32_t pbwindow = 25;//half of window. used for gamestate 0
+uint32_t noteArrayLen = 19; //max length - 1
 uint32_t noteArray[15][20];// todo: initialize 
 
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
@@ -526,98 +528,90 @@ void TIMG0_IRQHandler(void) {
   static uint8_t laststate = 0;
   static uint8_t laststateforotherplayer = 0; 
   static uint8_t valid = 0;
+
   if((TIMG0->CPU_INT.IIDX) == 1){ 
-    if(Switch_In()&0x4){
-      paused = 1;
+if(Switch_In()&0x4){
+  paused = 1;
+}
+else{
+  paused = 0;
+}
+  globalcountr++; 
+  //for when other player inputs
+  if((Switch_In()&(currentPlayer^0x03))){
+    if (currentPlayer==2){
+      cow1.state = 1;
+      if(!laststateforotherplayer){
+          Sound_Cow1();
+        }
     }
     else{
-      paused = 0;
+      bevo.state = 1;
+      if(!laststateforotherplayer){
+        Sound_Cow2();
+      }
     }
-    uint32_t IndexOnce = noteArray[gameRound][currNote]; // currNote and gameRound are reset and incremented respectively in 50hz timer, every 4 beats
-
-    globalcountr++; 
-
-    if(globalcountr%125000 <=100) {
-        Sound_Beat();
+  laststateforotherplayer = 1;
+}
+else{
+  laststateforotherplayer=0;
+    if (currentPlayer==2){
+      cow1.state = 0;
+    }
+    else{
+      bevo.state = 0;
     }
 
-    if (gameState ==2){
-    // GlobalcurrArray = GlobalcurrArray%2; //0/1 i dont update the gameround 
-      //add stuff later for storing rhythm from othe rplayer// addded 
-      if(globalcountr%125000 <=100)
-      {
-        Sound_Beat();
-      }
-      if(Switch_In() & currentPlayer){
-          if (currentPlayer==1){
-            cow1.state = 1;
-            if(!laststate){
-              noteArray[gameRound][currNote] = globalcountr;
-              currNote++;
-              Sound_Cow1();
-            }
+}
+uint32_t IndexOnce = noteArray[gameRound][currNote];
+
+//gs2 -> 2nd player inputting
+  if (gameState ==2){
+   // GlobalcurrArray = GlobalcurrArray%2; //0/1 i dont update the gameround 
+    //add stuff later for storing rhythm from othe rplayer// addded 
+
+    if(Switch_In() & currentPlayer){
+        if (currentPlayer==1){
+          cow1.state = 1;
+          Sound_Cow1();
+
+          if((!laststate)&&(currNote!=noteArrayLen)&&(globalcountr>window)){
+            noteArray[gameRound][currNote] = globalcountr;
+            currNote++;
           }
-          else{
-            bevo.state = 1;
-            if(!laststate){
-              noteArray[gameRound][currNote] = globalcountr;
-              currNote++;
-              Sound_Cow2();
-            }
+        }
+        else{
+          bevo.state = 1;
+          Sound_Cow2();
+          if((!laststate)&&(currNote!=noteArrayLen)&&(globalcountr>window)){
+            noteArray[gameRound][currNote] = globalcountr;
+            currNote++;
+            
           }
-          
-          laststate=1;
+        }
+        
+        laststate=1;
       }
-        //setup main testcase and debug after 
-    // }
       else{
-        laststate =0;
-          if (currentPlayer==1){
-            cow1.state =0;
-          }
-          else{
-            bevo.state = 0;
-          }
-      } 
-      if((Switch_In()&(currentPlayer^0x33))){
-          if (currentPlayer==2){
-            cow1.state = 1;
-            if(!laststateforotherplayer){
-                Sound_Cow1();
-              }
-          }
-          else{
-            bevo.state = 1;
-            if(!laststateforotherplayer){
-              Sound_Cow2();
-            }
-          }
-        laststateforotherplayer = 1;
-      }//noto self maybe merge later
-      else{
-        laststateforotherplayer=0;
-          if (currentPlayer==2){
-            cow1.state = 0;
-          }
-          else{
-            bevo.state = 0;
-          }
-      }
+      laststate =0;
+        if (currentPlayer==1){
+          cow1.state =0;
+        }
+        else{
+          bevo.state = 0;
+        }
+      //setup main testcase and debug after 
+    }
     } 
-  
-    
-//noto self gs2 is updated for sound+state
-//noto self check if we still want sprites to play when its not a p's turn //noto self do not reset p1 animations during nextstate done
 
-  else if (gameState == 1){
-    if(globalcountr%125000 <=100)
-    {
-      Sound_Beat();
-    }
-    if(globalcountr==(IndexOnce - window)){
+    //p1 hitting notes
+  else if (gameState ==1){ 
+    
+    if(globalcountr==(IndexOnce - window)){ //enterring hitwindow
       valid = 1;
+      
     }
-    else if (globalcountr ==(IndexOnce+window)){
+    else if ((globalcountr ==(IndexOnce+window))&&(IndexOnce!=-1)){//exiting hitwindow
       valid = 0;
       if (currentPlayer ==1){
           cow1.health--;
@@ -630,10 +624,9 @@ void TIMG0_IRQHandler(void) {
 //          Sound_Cow2Hurt(); MISSED NOTE COW 1 DUMMY FUNC
       }
       currNote ++;
-    }
+    }//detecting inputs
     if((Switch_In() & currentPlayer)){ //p1 = binary 01, p2 = binary 10
-      if(!laststate){  //noto self use switch_in() instead of gpiob done
-        //noto self do pause button stuff done
+      if(!laststate){  
         if (valid){
           valid = 0;
           currNote++;
@@ -655,19 +648,14 @@ void TIMG0_IRQHandler(void) {
           else{
             bevo.health--;
             bevo.state = 2;
-//          Sound_Cow1Hurt(); MISSED NOTE COW 1 DUMMY FUNC
+//          Sound_Cow2Hurt(); MISSED NOTE COW 2 DUMMY FUNC
           }
-          // if(globalcountr <=IndexOnce - extrawindow){
-          //   currNote++;
-          //   valid = 0;
-          // }
+
         }
     laststate = 1;
     }
     else{
       laststate=0;
-      // bevo.state = 0;
-      // cow1.state = 0;
     }
     }
     else{
@@ -678,68 +666,28 @@ void TIMG0_IRQHandler(void) {
       {
       cow1.state = 0;
       }
-    }
-    if(Switch_In() &(currentPlayer^0x3)){
-      if ((currentPlayer==1)&&(!laststateforotherplayer)){
-      bevo.state = 1;
-      Sound_Cow2();
-      }
-      else 
-      {
-      cow1.state = 1;
-      Sound_Cow1();
-      }
-    }
-    else{
-      if (currentPlayer==1){
-      bevo.state = 0;
-
-      }
-      else 
-      {
-      cow1.state = 0;
-      }
-    }
-//note to self change player/nextround at end of this if bloc
-//done
-//gs1 woks for sound
   }
+}
+
   else if (gameState ==0){
-    if(globalcountr==IndexOnce){
-      //play sound here
-      bevo.state = 1;
-      Sound_Cow2();
-    }
-    else{
-      bevo.state = 0;
-    }
-    if(globalcountr%125000 <=100)
-    {
-      Sound_Beat();
+    if(IndexOnce!=-1){
+        //playback has playback cap dependent on window; might use a seperate var for this, tbd
+      if((globalcountr>=IndexOnce-pbwindow/2)&&(globalcountr<=IndexOnce+pbwindow)){//playing notes doesnt need to account for which player b/c only accessible from 1p
+        bevo.state = 1;
+        if (globalcountr==IndexOnce){
+        Sound_Cow2();
+
+        }
+        else if(globalcountr==IndexOnce+window){
+        currNote++;
+        }
+      }
+      else{
+        bevo.state = 0;
+      }
     }
   }
-  if(noteArray[gameRound][currNote] == -1){
-    // bevo.sprite=0;
-    // cow1.sprite=0;
-    laststate=0;
-    //globalcountr =0;
-    //currNote =0;
-    //gameRound++;
-    // if(!(state&0x01)){//procs for state2 and state0
-    //   state = 1;
-      
-    // }
-    // else if(is2player){//1 for 1 player mode 2 for 2 player mode gameMode
-    //   state = 2;
-    // }
-    // else{
-    //   state = 0;
-    // }
 
-    // if(gameMode == 2){
-    //   currentPlayer^=0x3;
-    // }
 
   }
 }
-} 
