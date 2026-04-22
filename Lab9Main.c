@@ -351,6 +351,8 @@ uint32_t pbwindow = 30;//half of window. used for gamestate 0
 uint32_t noteArrayLen = 19; //max length - 
 uint32_t dist2nextnote = 100000;
 uint8_t chinese = 0;
+const char countOff[3] = {'3','2','1'};
+//ctrl f globals to go here
 // uint32_t noteArray[15][20];// todo: initialize 
 // int16_t noteArray[12][16];// todo: initialize
 int16_t noteArray[12][20] = {// Level 0
@@ -417,7 +419,7 @@ int main_gamestate1(void) {
   gameMode = 1;
   currentPlayer = 1;
   uint8_t testinglaststate = 1; //delete after
-  TimerG0_IntArm(40000, 4, 1); // 500hz
+  TimerG0_IntArm(40000, 2, 0); // 500hz
   
   __enable_irq();
   while(1){
@@ -547,7 +549,7 @@ int main(void){ // final main
   // noteArray[4][1] = -1;//soundtest should be 16
 
   TimerG12_IntArm(1600000,2); // 50hz -> 80MHZ/50HZ = 1600000
-  TimerG0_IntArm(40000, 4, 1); // 500hz
+  TimerG0_IntArm(40000, 2, 0); // 500hz
 
   while(1){
     if (paused) {
@@ -609,13 +611,26 @@ int main(void){ // final main
       // one player mode
       if (semaphore) {
         //update display
+        if(currentPlayer==1){
+          ST7735_DrawCharS(54, 30, '1', ST7735_ORANGE, ST7735_WHITE, 2); // fix
+        }
+        else{
+          ST7735_DrawCharS(54, 30, '2', ST7735_ORANGE, ST7735_WHITE, 2); // fix
+        }
+        if(gameState ==2){
+          ST7735_DrawCharS(64, 30, 'M', ST7735_ORANGE, ST7735_WHITE, 2); // fix
+        }
+        else if(gameState ==1){
+          ST7735_DrawCharS(64, 30, 'P', ST7735_ORANGE, ST7735_WHITE, 2); // fix
+        }
         ST7735_DrawBitmap(cow1.x, cow1.y, cow1.images[cow1.state], cow1.w,cow1.h);
         ST7735_DrawBitmap(bevo.x, bevo.y, bevo.images[bevo.state], bevo.w,bevo.h);
-        ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[cow1.state], cow1Box.w,cow1Box.h);
-        ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[bevo.state], bevoBox.w,bevoBox.h);
-        ST7735_DrawBitmap(dist2nextnote, 20, note_1x, 6,20);
-        ST7735_DrawBitmap(dist2nextnote+20, 20, note_white, 6,20);
+        ST7735_DrawBitmap(cow1Box.x, cow1Box.y, cow1Box.images[0], cow1Box.w,cow1Box.h);
+        ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[0], bevoBox.w,bevoBox.h);
+        ST7735_DrawBitmap(dist2nextnote+50, 20, note_1x, 6,20);
+        ST7735_DrawBitmap(dist2nextnote+70, 20, note_white, 6,20);
 
+          
         semaphore = 0;
       }
 
@@ -648,10 +663,9 @@ int main(void){ // final main
 
 // games  engine runs at 50Hz
 void TIMG12_IRQHandler(void){uint32_t pos,msg;
-  static uint8_t numBeats = 0;
   static uint32_t buffer = 0;
   static uint32_t counter = 30;
-  const char countOff[3] = {'3','2','1'};
+  static uint8_t numBeats = 0;
   if((TIMG12->CPU_INT.IIDX) == 1){ // this will acknowledge
     // ST7735_SetCursor(0, 0);
     // ST7735_OutUDec(gameState); // test whether the state changes are happening on time
@@ -688,9 +702,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
         }
         else if (gameState == 1) {
           gameRound^= 1; // new round(make it so that it cycles between row 0 and row 1)
-          currentPlayer^=0x3;
-          ST7735_SetCursor(0, 1);
-          ST7735_OutUDec(currentPlayer);//debug test current player
+          // currentPlayer^=0x3;
           gameState = 2; // 
         }
         else if (gameState == 3){ // check for the end of a count-in(which plays at the start of every game)
@@ -721,7 +733,6 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
             Chinese_SetCursor(64, 80);
             Chinese_OutString(Resume); //change
           }
-          
         }
         else {
           Sound_Beat();
@@ -886,10 +897,10 @@ watchrr = IndexOnce;
     }
     else{
       laststate = 0;
-      if (currentPlayer==2){
+      if (currentPlayer==2&&bevo.state ==1){
       bevo.state = 0;
       }
-      else 
+      else if(cow1.state == 1)
       {
       cow1.state = 0;
       }
@@ -918,9 +929,9 @@ watchrr = IndexOnce;
 
 
   }
-  cow1.y = 100 + (defaultHealth - cow1.health)*2;
-  bevo.y = 100 + (defaultHealth - bevo.health)*2;
-  cow1Box.y =cow1.y +60;
-  bevoBox.y =bevo.y + 60;
+  // cow1.y = 100 + (defaultHealth - cow1.health)*2;
+  // bevo.y = 100 + (defaultHealth - bevo.health)*2;
+  // cow1Box.y =cow1.y +60;
+  // bevoBox.y =bevo.y + 60;
   globalcountr++; 
 }
