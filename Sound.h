@@ -13,7 +13,7 @@
 // This is called once
 void Sound_Init(void);
 
-//******* Sound_Start ************
+//** Sound_Start **
 // This function does not output to the DAC. 
 // Rather, it sets a pointer and counter, and then enables the SysTick interrupt.
 // It starts the sound, and the SysTick ISR does the output
@@ -23,12 +23,13 @@ void Sound_Init(void);
 //        count is the length of the array
 // Output: none
 // special cases: as you wish to implement
-// void Sound_Start(const uint8_t *pt, uint32_t count);
+// void Sound_Start(const uint8_tpt, uint32_t count);
 
 // following 8 functions do not output to the DAC
 // they configure pointers/counters and initiate the sound by calling Sound_Start
 void Sound_Beat(void);
 void Sound_Cow1(void);
 void Sound_Cow2(void);
+void Sound_Count(uint8_t index);
 
 #endif
