@@ -13,7 +13,7 @@
 //#include "../inc/FIFO1.h"
 //#include "FIFO2.h"
 
-#define BEATLEN 3377
+#define BEATLEN 4080
 #define COW1LEN 10632
 #define COW2LEN 9450
 
@@ -47,7 +47,7 @@ void SysTick_Handler(void){ // called at 11 kHz
   uint32_t stream1 = 0, stream2 = 0, stream3 = 0;
   uint8_t active_streams = 0;
   if (beatIndex < BEATLEN) {
-    stream1 = cow_high[beatIndex]; // change later
+    stream1 = shoot[beatIndex]; // change later
     beatIndex++;
     active_streams++;
   }
