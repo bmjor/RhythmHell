@@ -33,8 +33,10 @@ Chinese_t ChineseSel[] = {zhong, wen,null};
 Chinese_t Start[] = {kai, shi1,null};
 Chinese_t Pause[] = {zan, ting,null};
 Chinese_t Resume[] = {hui, fu,null};
-Chinese_t ManualMode[] = {dan, ren, mo, shi2,null};
-Chinese_t MultiplayerMode[] = {shuan, ren, mo, shi2,null};
+Chinese_t ManualMode1[] = {yao, dan, ren, mo, shi2, null};
+Chinese_t ManualMode2[] = {yong, wan,jia,yi,null};
+Chinese_t MultiplayerMode1[] = {yao, shuan, ren, mo, shi2, null};
+Chinese_t MultiplayerMode2[] = {yong, wan,jia,er, null};
 Chinese_t WinManual[] = {ni, ying2,le, ex, null}; //add an exclamation
 Chinese_t LoseManual[] = {ni, shu, le, ex, null};//add exclamation
 Chinese_t Player1Wins[] = {wan, jia, yi, ying2, le, ex, null}; //add exclamation
@@ -120,9 +122,9 @@ int main0cn(void){ // main 0mod but for chiense
   Chinese_SetCursor(65,8);
   Chinese_OutString(Resume);
   Chinese_SetCursor(81,8);
-  Chinese_OutString(ManualMode);
+  Chinese_OutString(ManualMode1);
   Chinese_SetCursor(64, 16);
-  Chinese_OutString( MultiplayerMode);
+  Chinese_OutString( MultiplayerMode2);
   Chinese_SetCursor(0,24 );
   Chinese_OutString( WinManual);
   // ST7735_SetCursor(24, 24);
@@ -577,10 +579,27 @@ int main(void){ // final main
       if(chinese){
         Chinese_SetCursor(42, 98);
         Chinese_OutString(pausetochoose);
+        ST7735_SetCursor(0, 11);
+        ST7735_OutString(ManualMode1);
+        ST7735_SetCursor(0, 12);
+        ST7735_OutString(ManualMode2);
+        ST7735_SetCursor(15, 11);
+        ST7735_OutString(MultiplayerMode1);
+        ST7735_SetCursor(15, 12);
+        ST7735_OutString(MultiplayerMode2);
       }
       else{
         ST7735_SetCursor(7, 9);
         ST7735_OutString("Pause=Chinese");
+        ST7735_SetCursor(0, 11);
+        ST7735_OutString("Use p1 for");
+        ST7735_SetCursor(0, 12);
+        ST7735_OutString("singleplayer");
+        ST7735_SetCursor(15, 11);
+        ST7735_OutString("Use p2 for");
+        ST7735_SetCursor(15, 12);
+        ST7735_OutString("multiplayer");
+
       }
       while(Switch_In()!=0){//init debounce
 
