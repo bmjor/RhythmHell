@@ -640,6 +640,14 @@ int main(void){ // final main
         ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[bevo.state], bevoBox.w,bevoBox.h); // change later if sprite changes
         ST7735_DrawBitmap(dist2nextnote+50, 20, note_1x, 6,20);
         ST7735_DrawBitmap(dist2nextnote+70, 20, note_white, 6,20);
+        if (currentPlayer == 2) {
+          ST7735_DrawBitmap(bevo.x+30, 50, pointer, 17,20);
+          ST7735_FillRect(cow1.x+15, 30, 17, 20, ST7735_WHITE);
+        }
+        else if (currentPlayer == 1){
+          ST7735_DrawBitmap(cow1.x+15, 50, pointer, 17,20);
+          ST7735_FillRect(bevo.x+30, 30, 17, 20, ST7735_WHITE);
+        }
         semaphore = 0;
       }
     }
