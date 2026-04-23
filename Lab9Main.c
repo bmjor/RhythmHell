@@ -461,6 +461,9 @@ int main_gamestate1(void) {
     ST7735_OutUDec(currNote);
     ST7735_SetCursor(0, 1);
     ST7735_OutUDec(cow1.health);
+    if(cow1.health<=9){
+      ST7735_OutChar(' ');
+    }
     ST7735_SetCursor(0,2);
     ST7735_OutUDec(gameRound);
     ST7735_SetCursor(0,3);
@@ -579,13 +582,13 @@ int main(void){ // final main
       if(chinese){
         Chinese_SetCursor(42, 98);
         Chinese_OutString(pausetochoose);
-        Chinese_SetCursor(0, 110);
+        Chinese_SetCursor(0, 116);
         Chinese_OutString(ManualMode1);
-        Chinese_SetCursor(0, 118);
+        Chinese_SetCursor(0, 124);
         Chinese_OutString(ManualMode2);
-        Chinese_SetCursor(72, 110);
+        Chinese_SetCursor(84, 116);
         Chinese_OutString(MultiplayerMode1);
-        Chinese_SetCursor(72, 118);
+        Chinese_SetCursor(84, 124);
         Chinese_OutString(MultiplayerMode2);
       }
       else{
@@ -594,11 +597,11 @@ int main(void){ // final main
         ST7735_SetCursor(0, 11);
         ST7735_OutString("P1:");
         ST7735_SetCursor(0, 12);
-        ST7735_OutString("1-Player");
-        ST7735_SetCursor(11, 11);
+        ST7735_OutString("1Player");
+        ST7735_SetCursor(13, 11);
         ST7735_OutString("P2:");
-        ST7735_SetCursor(11, 12);
-        ST7735_OutString("2-Player");
+        ST7735_SetCursor(13, 12);
+        ST7735_OutString("2Player");
       }
       while(Switch_In()!=0){//init debounce
 
@@ -645,12 +648,20 @@ int main(void){ // final main
         //ST7735_DrawBitmap(bevoBox.x, bevoBox.y, bevoBox.images[bevo.state], bevoBox.w,bevoBox.h);
         ST7735_DrawBitmap(dist2nextnote+50, 20, note_1x, 6,20);
         ST7735_DrawBitmap(dist2nextnote+70, 20, note_white, 6,20); //notes
-        ST7735_SetCursor(7, 0);
+        ST7735_SetCursor(13, 0);
         ST7735_OutUDec(gameRound);
         ST7735_SetCursor(7, 1);
         ST7735_OutUDec(cow1.health);
-        ST7735_SetCursor(7, 2);
-        ST7735_OutUDec(cow1.health);
+        if(cow1.health<=9){
+          ST7735_OutChar(' ');
+        }
+        if(gameMode ==2){
+        ST7735_SetCursor(16, 1);
+        ST7735_OutUDec(bevo.health); 
+        if(bevo.health<=9){
+          ST7735_OutChar(' ');
+        }
+        }
         semaphore = 0;
       }
     
@@ -691,9 +702,9 @@ int main(void){ // final main
         ST7735_DrawBitmap(0, 114, namecard, 160,22);
         ST7735_DrawBitmap(0, 130, namecard, 160,22);
         if(chinese){
-          Chinese_SetCursor(42, 98);
+          Chinese_SetCursor(50, 90);
           Chinese_OutString(LoseManual);
-          Chinese_SetCursor(18, 128);
+          Chinese_SetCursor(42, 128);
           Chinese_OutString(youmadeittoround);
           ST7735_SetCursor(14, 12);
           ST7735_OutUDec(gameRound);
@@ -704,21 +715,21 @@ int main(void){ // final main
           ST7735_SetCursor(7, 11);
           ST7735_OutString("You made it");
           ST7735_SetCursor(7, 12);
-          ST7735_OutString("to round");
+          ST7735_OutString("to round ");
           ST7735_SetCursor(16, 12);
           ST7735_OutUDec(gameRound);
 
         }
         }
         else {
-          ST7735_FillScreen(ST7735_GREEN);
+        ST7735_FillScreen(ST7735_Color565(191,87,0));
         ST7735_DrawBitmap(160, 0, namecard, 160,22);
         ST7735_DrawBitmap(120, 32, namecard, 160,22);
         ST7735_DrawBitmap(80, 64, namecard, 160,22);
         ST7735_DrawBitmap(40, 96, namecard, 160,22);
         ST7735_DrawBitmap(0, 128, namecard, 160,22);
         if(chinese){
-          Chinese_SetCursor(42, 98);
+          Chinese_SetCursor(50, 90);
           Chinese_OutString(Player2Wins);
         }
         else{
@@ -729,28 +740,30 @@ int main(void){ // final main
         }
       }
       else if (bevo.health <= 0) {
+        ST7735_FillScreen(ST7735_Color565(51,  63,  72));
         ST7735_DrawBitmap(0, 0, namecard, 160,22);
         ST7735_DrawBitmap(0, 32, namecard, 160,22);
         ST7735_DrawBitmap(0, 64, namecard, 160,22);
         ST7735_DrawBitmap(0, 96, namecard, 160,22);
         ST7735_DrawBitmap(0, 128, namecard, 160,22);
         if(chinese){
-          Chinese_SetCursor(42, 98);
+          Chinese_SetCursor(50, 90);
           Chinese_OutString(Player1Wins);
         }
-        else{
+        else if(gameMode ==2){
           ST7735_SetCursor(7, 9);
           ST7735_OutString("P1 Wins!");
         }
       }
       else if (gameRound >= 15 && gameMode == 1) {
+        ST7735_FillScreen(ST7735_GREEN);
                 ST7735_DrawBitmap(0, 0, namecard, 160,22);
         ST7735_DrawBitmap(0, 32, namecard, 160,22);
         ST7735_DrawBitmap(0, 64, namecard, 160,22);
         ST7735_DrawBitmap(0, 96, namecard, 160,22);
         ST7735_DrawBitmap(0, 128, namecard, 160,22);
         if(chinese){
-          Chinese_SetCursor(42, 98);
+          Chinese_SetCursor(50, 90);
           Chinese_OutString(WinManual);
         }
         else{
@@ -845,8 +858,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
           
           }
           else if (chinese) {
-            Chinese_SetCursor(64, 38);
-            ST7735_DrawBitmap(64,30, goCN, 24,16); //change
+            ST7735_DrawBitmap(67,43, goCN, 24,16); //change
           }
         
         }
