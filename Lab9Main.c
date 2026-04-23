@@ -545,8 +545,8 @@ int main(void){ // final main
       uint32_t press = Switch_In();
       if (press == 4) {
       ST7735_FillRect(0, 31, 160, 44, ST7735_WHITE);
-      ST7735_DrawBitmap(95, 160, bevoBox.images[bevoBox.state], 60, 60);
-      ST7735_DrawBitmap(15, 160, cow1Box.images[cow1Box.state], 60, 60);
+      ST7735_DrawBitmap(95, 160, box_orange, 60, 60);
+      ST7735_DrawBitmap(15, 160, box_charcoal, 60, 60);
       gameMode = tempGameMode;
       }
       else {
