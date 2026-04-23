@@ -365,30 +365,30 @@ uint8_t lastpause = 0;
 uint8_t soundtest = 0;
 uint8_t drawBox = 0;
 uint32_t volume = 0;
-int16_t noteArray[11][20] = {// Level 0
-       // {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 1
-        {10, 250, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 2
-        {10, 250, 375, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 3
-        {10, 125, 250, 500, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 4
-        {10, 125, 375, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 5
-        {125, 375, 625, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 6
-        {10, 62, 188, 250, 375, 500, 562, 688, 750, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 7
-        {125, 250, 333, 416, 625, 688, 750, 833, 916, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 8
-        {125, 375, 438, 500, 600, 700, 800, 900, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 9
-        {10, 111, 222, 333, 444, 555, 666, 777, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 10
-        {175, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        // Level 11
-        {10, 62, 125, 188, 250, 312, 375, 438, 500, 562, 625, 688, 750, 812, 875, 938, -1, -1, -1, -1}
+uint8_t numBeats = 0;
+  int16_t noteArray[11][20] = {// Level 0
+// Level 1
+{0, 250, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 2
+{0, 250, 375, 500, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 3
+{0, 125, 250, 500, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 4
+{0, 125, 375, 625, 750, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 5
+{125, 375, 625, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 6
+{0, 62, 188, 250, 375, 500, 562, 688, 750, 875, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 7
+{125, 250, 333, 416, 625, 688, 750, 833, 916, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 8
+{125, 375, 438, 500, 600, 700, 800, 900, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 9
+{0, 111, 222, 333, 444, 555, 666, 777, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 10
+{175, 888, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// Level 11
+{0, 62, 125, 188, 250, 312, 375, 438, 500, 562, 625, 688, 750, 812, 875, 938, -1, -1, -1, -1}
       };
 
 
@@ -545,8 +545,8 @@ int main(void){ // final main
       uint32_t press = Switch_In();
       if (press == 4) {
       ST7735_FillRect(0, 31, 160, 44, ST7735_WHITE);
-      ST7735_DrawBitmap(95, bevoBox.y, bevoBox.images[bevoBox.state], 60, 60);
-      ST7735_DrawBitmap(15, cow1Box.y, cow1Box.images[cow1Box.state], 60, 60);
+      ST7735_DrawBitmap(95, 160, bevoBox.images[bevoBox.state], 60, 60);
+      ST7735_DrawBitmap(15, 160, cow1Box.images[cow1Box.state], 60, 60);
       gameMode = tempGameMode;
       }
       else {
@@ -598,7 +598,7 @@ int main(void){ // final main
    //   ST7735_DrawBitmap(0, 50, namecard, 160, 22); // temp
       //initialize var
       gameMode = press;
-
+      numBeats = 0;
       gameState = 3; // set gameState to 3 to trigger 4 beat count in
       gameRound = 0;
       while (Switch_In() != 0) {}
@@ -653,10 +653,11 @@ int main(void){ // final main
         if (gameMode == 1){
         ST7735_FillScreen(ST7735_RED);
         ST7735_DrawBitmap(0, 0, namecard, 160,22);
-        ST7735_DrawBitmap(0, 32, namecard, 160,22);
-        ST7735_DrawBitmap(0, 64, namecard, 160,22);
-        ST7735_DrawBitmap(0, 96, namecard, 160,22);
-        ST7735_DrawBitmap(0, 128, namecard, 160,22);
+        ST7735_DrawBitmap(0, 26, namecard, 160,22);
+        ST7735_DrawBitmap(0, 52, namecard, 160,22);
+        ST7735_DrawBitmap(0, 88, namecard, 160,22);
+        ST7735_DrawBitmap(0, 114, namecard, 160,22);
+        ST7735_DrawBitmap(0, 130, namecard, 160,22);
         if(chinese){
           Chinese_SetCursor(42, 98);
           Chinese_OutString(LoseManual);
@@ -668,10 +669,10 @@ int main(void){ // final main
         }
         else {
           ST7735_FillScreen(ST7735_GREEN);
-        ST7735_DrawBitmap(0, 0, namecard, 160,22);
-        ST7735_DrawBitmap(0, 32, namecard, 160,22);
-        ST7735_DrawBitmap(0, 64, namecard, 160,22);
-        ST7735_DrawBitmap(0, 96, namecard, 160,22);
+        ST7735_DrawBitmap(160, 0, namecard, 160,22);
+        ST7735_DrawBitmap(120, 32, namecard, 160,22);
+        ST7735_DrawBitmap(80, 64, namecard, 160,22);
+        ST7735_DrawBitmap(40, 96, namecard, 160,22);
         ST7735_DrawBitmap(0, 128, namecard, 160,22);
         if(chinese){
           Chinese_SetCursor(42, 98);
@@ -714,7 +715,7 @@ int main(void){ // final main
           ST7735_OutString("You Win!");
         }
       }
-
+      Clock_Delay1ms(1500);
       while (Switch_In() == 0) {
       }
       gameMode = 0; 
@@ -729,7 +730,7 @@ int main(void){ // final main
 void TIMG12_IRQHandler(void){uint32_t pos,msg;
   static uint32_t buffer = 0;
   static uint32_t counter = 30;
-  static uint8_t numBeats = 0;
+
   if((TIMG12->CPU_INT.IIDX) == 1){ // this will acknowledge
     // ST7735_SetCursor(0, 0);
     // ST7735_OutUDec(gameState); // test whether the state changes are happening on time
@@ -797,12 +798,13 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
           else if (!chinese){
             ST7735_DrawCharS(64, 30, 'G', ST7735_ORANGE, ST7735_WHITE, 2); // fix
             ST7735_DrawCharS(76, 30, 'O', ST7735_ORANGE, ST7735_WHITE, 2); // fix
-        
+          
           }
-          else {
-            Chinese_SetCursor(64, 80);
+          else if (chinese) {
+            Chinese_SetCursor(64, 38);
             Chinese_OutString(Resume); //change
           }
+        
         }
         else {
           Sound_Beat();
