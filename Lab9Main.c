@@ -368,7 +368,7 @@ uint8_t supertempscore =0;
 uint8_t lastpause = 0;
 uint8_t soundtest = 0;
 uint8_t drawBox = 0;
-uint32_t volume = 0;
+uint32_t volume = 1;
 uint8_t numBeats = 0;
   int16_t noteArray[11][20] = {// Level 0
 // Level 1
@@ -783,7 +783,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
     // ST7735_OutUDec(gameRound); // test if game round is incrememnting
     // ST7735_SetCursor(0,3);
     // ST7735_OutUDec(cow1.health);
-    volume = Convert(ADCin())/20;
+    //volume = Convert(ADCin())/20;
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
     if (numBeats >= 4 && counter == 0) { // FOUR BEATS have elapsed, new state
@@ -822,12 +822,13 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
       
     }
     //else {
+      buffer = Convert(ADCin());
       if (counter == 0) { // ONE BEAT HAS ELAPSED
         if (cow1.health < defaultHealth) {
           cow1.health++;
         }
         if (gameMode == 2) { 
-          buffer = 25 + (ADCin()/100);//Convert(ADCin()); // variable tempo for two player mode
+          //buffer = 25 + (ADCin()/100);//Convert(ADCin()); // variable tempo for two player mode
           counter = buffer;
         }
         else { //disable variable tempo for single player mode, fixed at 120 bpm (2 beats per second)
@@ -876,7 +877,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
   }
 
-
+//}
 // switches run at 500hz
 void TIMG0_IRQHandler(void) {
 //todo: testcases for main, other sprite stuff
