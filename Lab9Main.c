@@ -43,8 +43,8 @@ Chinese_t Player1Wins[] = {wan, jia, yi, ying2, le, ex, null}; //add exclamation
 Chinese_t Player2Wins[] = {wan, jia, er, ying2, le,ex, null};//add exclamation
 Chinese_t pausetochoose[] = {yao, ying1, wen, yong, zan, ting, kai, guan,null};
 Chinese_t gotohome[] = {yao, tui, chu, hui1, jia, yong, wan,jia, huo,zhe, wan,jia,er ,null};
-Chinese_t gotocontinue[] = {yao, hui, fu, yong, zan,ting,kai,guan};
-Chinese_t youmadeittoround[] = {ni, jin, ru, le, lun};
+Chinese_t gotocontinue[] = {yao, hui, fu, yong, zan,ting,kai,guan,null};
+Chinese_t youmadeittoround[] = {ni, jin, ru, le, lun,null};
 
 //********ST7735_OutStringLanguage*****************
 // Print a string of characters to the ST7735 LCD in either English or Mandarin Chinese
@@ -579,27 +579,26 @@ int main(void){ // final main
       if(chinese){
         Chinese_SetCursor(42, 98);
         Chinese_OutString(pausetochoose);
-        ST7735_SetCursor(0, 11);
-        ST7735_OutString(ManualMode1);
-        ST7735_SetCursor(0, 12);
-        ST7735_OutString(ManualMode2);
-        ST7735_SetCursor(15, 11);
-        ST7735_OutString(MultiplayerMode1);
-        ST7735_SetCursor(15, 12);
-        ST7735_OutString(MultiplayerMode2);
+        Chinese_SetCursor(0, 110);
+        Chinese_OutString(ManualMode1);
+        Chinese_SetCursor(0, 118);
+        Chinese_OutString(ManualMode2);
+        Chinese_SetCursor(72, 110);
+        Chinese_OutString(MultiplayerMode1);
+        Chinese_SetCursor(72, 118);
+        Chinese_OutString(MultiplayerMode2);
       }
       else{
-        ST7735_SetCursor(7, 9);
+        ST7735_SetCursor(7, 9);                                                                                                           
         ST7735_OutString("Pause=Chinese");
         ST7735_SetCursor(0, 11);
-        ST7735_OutString("Use p1 for");
+        ST7735_OutString("P1:");
         ST7735_SetCursor(0, 12);
-        ST7735_OutString("singleplayer");
-        ST7735_SetCursor(15, 11);
-        ST7735_OutString("Use p2 for");
-        ST7735_SetCursor(15, 12);
-        ST7735_OutString("multiplayer");
-
+        ST7735_OutString("1-Player");
+        ST7735_SetCursor(11, 11);
+        ST7735_OutString("P2:");
+        ST7735_SetCursor(11, 12);
+        ST7735_OutString("2-Player");
       }
       while(Switch_In()!=0){//init debounce
 
@@ -686,18 +685,22 @@ int main(void){ // final main
         if(chinese){
           Chinese_SetCursor(42, 98);
           Chinese_OutString(LoseManual);
-          Chinese_SetCursor(42, 107);
+          Chinese_SetCursor(18, 128);
           Chinese_OutString(youmadeittoround);
+          ST7735_SetCursor(14, 12);
+          ST7735_OutUDec(gameRound);
         }
         else{
           ST7735_SetCursor(7, 9);
           ST7735_OutString("You Lose!");
           ST7735_SetCursor(7, 11);
-          ST7735_OutString("You made it to round:");
+          ST7735_OutString("You made it");
+          ST7735_SetCursor(7, 12);
+          ST7735_OutString("to round");
+          ST7735_SetCursor(16, 12);
+          ST7735_OutUDec(gameRound);
 
         }
-          ST7735_SetCursor(7, 12);
-          ST7735_OutUDec(gameRound);
         }
         else {
           ST7735_FillScreen(ST7735_GREEN);
@@ -834,7 +837,7 @@ void TIMG12_IRQHandler(void){uint32_t pos,msg;
           }
           else if (chinese) {
             Chinese_SetCursor(64, 38);
-            Chinese_OutString(goCN); //change
+            ST7735_DrawBitmap(64,30, goCN, 24,16); //change
           }
         
         }
