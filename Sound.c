@@ -36,7 +36,7 @@ static uint32_t oneIndex;
 static uint32_t twoIndex;
 static uint32_t threeIndex;
 static uint32_t goIndex;
-
+extern uint32_t volume;  
 
 void SysTick_IntArm(uint32_t period, uint32_t priority){
   SysTick->CTRL = 0x00;
@@ -108,7 +108,7 @@ void SysTick_Handler(void){ // called at 11 kHz
 
   sum = stream1 + stream2 + stream3;
   if (active_streams > 0){
-    DAC_Out(sum/active_streams); // to prevent peaking
+    DAC_Out((sum/active_streams)/volume); // to prevent peaking
     //DAC_Out(sum/4);
   }
   else {
