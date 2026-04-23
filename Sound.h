@@ -7,6 +7,7 @@
 #define SOUND_H
 #include <stdint.h>
 
+
 // initialize a 11kHz SysTick, however no sound should be started
 // initialize any global variables
 // Initialize the 5 bit DAC

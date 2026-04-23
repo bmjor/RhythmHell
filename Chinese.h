@@ -188,7 +188,7 @@
 /**
  * \brief Chinese character set
  */
-typedef enum {null, ying1, zhong, wen, kai, shi1, zan, ting, hui, fu, dan, shuan, ren, mo, shi2, ni, ying2, shu, le, wan, jia, yi, er, slash, ex, period, comma,yao, yong, guan, he, tui, chu, dao, cai, huo, zhe,} Chinese_t;
+typedef enum {null, ying1, zhong, wen, kai, shi1, zan, ting, hui, fu, dan, shuan, ren, mo, shi2, ni, ying2, shu, le, wan, jia, yi, er, slash, ex, period, comma,yao, yong, guan, he, tui, chu, dao, cai, huo, zhe,jin,ru,lun,hui1} Chinese_t;
 
 
 
